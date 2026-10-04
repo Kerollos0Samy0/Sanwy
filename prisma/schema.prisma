@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Youth {
+  id          String       @id @default(uuid())
+  name        String
+  grade       String?      
+  totalPoints Int          @default(0)
+  createdAt   DateTime     @default(now())
+  pointsLogs  PointsLog[]
+}
+
+model PointsLog {
+  id          String       @id @default(uuid())
+  youthId     String
+  reason      String       
+  points      Int          
+  servantName String?      
+  createdAt   DateTime     @default(now())
+
+  youth       Youth        @relation(fields: [youthId], references: [id])
+}
