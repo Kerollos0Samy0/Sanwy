@@ -86,6 +86,7 @@ export default function Admin() {
                 {/* Quick Add Buttons */}
                 <div className="flex flex-wrap gap-2 md:gap-3 w-full xl:w-auto">
                   <button onClick={() => handleAddPoints(y.id, 50, "القداس")} className="flex-1 md:flex-none bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border-2 border-blue-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">القداس (+50)</button>
+                  <button onClick={() => handleAddPoints(20, "التناول")} className="flex-1 md:flex-none bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border-2 border-teal-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">التناول (+20)</button>
                   <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="flex-1 md:flex-none bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border-2 border-purple-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">التسبحة (+30)</button>
                   <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="flex-1 md:flex-none bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">العشية (+20)</button>
                 </div>

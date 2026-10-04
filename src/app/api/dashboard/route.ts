@@ -27,12 +27,14 @@ export async function GET() {
   const topTasbeha = getTopByReason("التسبحة");
   const topService = getTopByReason("الخدمة");
   const topVespers = getTopByReason("العشية");
+  const topCommunion = getTopByReason("التناول");
 
   return NextResponse.json({
     overall,
     topLiturgy,
     topTasbeha,
     topService,
-    topVespers
+    topVespers,
+    topCommunion
   });
 }

@@ -42,6 +42,7 @@ export default function Scan() {
       {!scannedId ? (
         <div className="w-full max-w-sm bg-gray-800 rounded-3xl overflow-hidden shadow-2xl border-4 border-blue-500 relative">
           <Scanner onScan={(result) => setScannedId(result[0].rawValue)} />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-dashed border-white opacity-50 pointer-events-none"></div>
           <p className="text-center p-4 text-gray-300 font-bold bg-gray-900">وجه الكاميرا للكارنيه بتاع المخدوم</p>
         </div>
       ) : (
@@ -55,6 +56,7 @@ export default function Scan() {
               
               <div className="grid grid-cols-1 gap-4">
                 <button onClick={() => handleAddPoints(50, "القداس")} className="bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-xl shadow-lg transition">حضور القداس (+50)</button>
+                <button onClick={() => handleAddPoints(20, "التناول")} className="bg-teal-600 hover:bg-teal-700 text-white py-4 rounded-xl font-bold text-xl shadow-lg transition">التناول (+20)</button>
                 <button onClick={() => handleAddPoints(30, "التسبحة")} className="bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-bold text-xl shadow-lg transition">حضور التسبحة (+30)</button>
                 <button onClick={() => handleAddPoints(20, "العشية")} className="bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-xl shadow-lg transition">حضور العشية (+20)</button>
                 <button onClick={() => { setScannedId(null); setYouth(null); }} className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 mt-4 rounded-xl font-bold text-lg">إلغاء ومسح كود آخر</button>
