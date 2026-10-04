@@ -24,11 +24,12 @@ export default function Scan() {
 
   const handleAddPoints = async (points: number, reason: string) => {
     if (!scannedId) return;
-    await fetch('/api/points', {
+    const res = await fetch('/api/points', {
       method: 'POST',
       body: JSON.stringify({ youthId: scannedId, reason, points, servantName: "خادم (موبايل)" })
     });
-    alert(`تم إضافة ${points} نقطة بنجاح لـ ${youth.name}`);
+    const data = await res.json();
+    alert(`تم إضافة ${data.log.points} نقطة بنجاح لـ ${youth.name}`);
     setScannedId(null);
     setYouth(null);
   }
