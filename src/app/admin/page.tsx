@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { fireConfetti, playSuccessSound } from "@/lib/effects";
 
 export default function Admin() {
   const [name, setName] = useState("");
@@ -25,6 +26,11 @@ export default function Admin() {
       method: 'POST',
       body: JSON.stringify({ youthId: id, reason, points, servantName: "أدمن" })
     });
+    
+    // Play Effects!
+    playSuccessSound();
+    fireConfetti();
+
     const data = await res.json();
     if (reason === "القداس") {
       alert(`تم إضافة ${data.log.points} نقطة للقداس (حسب التكرار هذا الأسبوع)`);

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import Link from "next/link";
+import { fireConfetti, playSuccessSound } from "@/lib/effects";
 
 export default function Scan() {
   const [scannedId, setScannedId] = useState<string | null>(null);
@@ -28,6 +29,11 @@ export default function Scan() {
       method: 'POST',
       body: JSON.stringify({ youthId: scannedId, reason, points, servantName: "خادم (موبايل)" })
     });
+    
+    // Play effects
+    playSuccessSound();
+    fireConfetti();
+
     const data = await res.json();
     alert(`تم إضافة ${data.log.points} نقطة بنجاح لـ ${youth.name}`);
     setScannedId(null);
