@@ -34,8 +34,17 @@ export default function Admin() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8 border-b pb-4">
           <h1 className="text-4xl font-bold text-blue-900">لوحة تحكم الخدام</h1>
-          <Link href="/admin/logs" className="bg-gray-800 text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-gray-900">
-            السجل العام للنقاط 📜
+        </div>
+        
+        <div className="flex flex-wrap gap-4 mb-8">
+          <Link href="/admin/scan" className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-4 rounded-xl shadow-lg text-lg flex-1 text-center">
+            📷 تسجيل الحضور بالكاميرا (QR)
+          </Link>
+          <Link href="/admin/cards" className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-4 rounded-xl shadow-lg text-lg flex-1 text-center">
+            🖨️ طباعة كارنيهات المخدومين
+          </Link>
+          <Link href="/admin/logs" className="bg-gray-800 hover:bg-black text-white font-bold px-6 py-4 rounded-xl shadow-lg text-lg flex-1 text-center">
+            📜 السجل العام للنقاط
           </Link>
         </div>
         
