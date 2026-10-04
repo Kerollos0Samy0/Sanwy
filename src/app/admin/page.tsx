@@ -138,6 +138,7 @@ export default function Admin() {
                   <button onClick={() => handleAddPoints(y.id, 20, "التناول")} className="flex-1 md:flex-none bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border-2 border-teal-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">التناول (+20)</button>
                   <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="flex-1 md:flex-none bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border-2 border-purple-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">التسبحة (+30)</button>
                   <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="flex-1 md:flex-none bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">العشية (+20)</button>
+                  <button onClick={() => handleAddPoints(y.id, 50, "الخدمة")} className="flex-1 md:flex-none bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border-2 border-rose-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">الخدمة (+50)</button>
                 </div>
 
                 {/* Custom Add/Deduct */}
