@@ -30,73 +30,84 @@ export default function Admin() {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8 border-b pb-4">
-          <h1 className="text-4xl font-bold text-blue-900">لوحة تحكم الخدام</h1>
+    <div dir="rtl" className="min-h-screen bg-slate-100 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6 border-b-2 border-gray-200 pb-4">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900">لوحة تحكم الخدام</h1>
         </div>
         
-        <div className="flex flex-wrap gap-4 mb-8">
-          <Link href="/admin/scan" className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-4 rounded-xl shadow-lg text-lg flex-1 text-center">
-            📷 تسجيل الحضور بالكاميرا (QR)
+        {/* Top Action Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Link href="/admin/scan" className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-6 rounded-2xl shadow-md text-xl text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
+            <span className="text-4xl mb-3">📷</span>
+            تسجيل الحضور بالكاميرا
           </Link>
-          <Link href="/admin/cards" className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-4 rounded-xl shadow-lg text-lg flex-1 text-center">
-            🖨️ طباعة كارنيهات المخدومين
+          <Link href="/admin/cards" className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-6 rounded-2xl shadow-md text-xl text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
+            <span className="text-4xl mb-3">🖨️</span>
+            طباعة الكارنيهات (QR)
           </Link>
-          <Link href="/admin/logs" className="bg-gray-800 hover:bg-black text-white font-bold px-6 py-4 rounded-xl shadow-lg text-lg flex-1 text-center">
-            📜 السجل العام للنقاط
+          <Link href="/admin/logs" className="bg-gray-800 hover:bg-black text-white font-bold px-4 py-6 rounded-2xl shadow-md text-xl text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
+            <span className="text-4xl mb-3">📜</span>
+            السجل العام للنقاط
           </Link>
         </div>
         
-        <div className="bg-white p-6 rounded-xl shadow-md mb-8 flex flex-col md:flex-row gap-4 items-end border border-gray-100">
-          <div className="flex-1">
+        {/* Add New Youth Form */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-end border border-gray-200">
+          <div className="flex-1 w-full">
             <label className="block text-gray-700 font-bold mb-2">إضافة مخدوم جديد</label>
             <input 
-              className="w-full border-2 border-gray-300 p-3 rounded-lg focus:outline-none focus:border-blue-500" 
-              value={name} onChange={e => setName(e.target.value)} placeholder="اسم المخدوم..." 
+              className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+              value={name} onChange={e => setName(e.target.value)} placeholder="اكتب اسم المخدوم هنا..." 
             />
           </div>
-          <button onClick={handleAddYouth} className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-lg shadow">إضافة للقائمة</button>
+          <button onClick={handleAddYouth} className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-4 rounded-xl shadow-md text-lg transition">إضافة للقائمة</button>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">قائمة المخدومين (تسجيل الحضور والنقاط)</h2>
+        {/* Youth List */}
+        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">قائمة المخدومين (تسجيل الحضور والنقاط)</h2>
           <div className="grid gap-6">
             {youths.map(y => (
-              <div key={y.id} className="flex flex-col xl:flex-row justify-between items-center p-5 bg-gray-50 border border-gray-200 rounded-xl hover:shadow-md transition">
+              <div key={y.id} className="flex flex-col xl:flex-row justify-between items-start xl:items-center p-5 bg-white border-2 border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition gap-6">
                 
-                <div className="text-xl font-bold text-gray-800 mb-4 xl:mb-0 w-full xl:w-1/4">
-                  <Link href={`/admin/youth/${y.id}`} className="text-blue-800 hover:underline">{y.name}</Link>
-                  <span className="text-sm font-normal text-gray-500 block mt-1">الإجمالي: <strong className="text-blue-600 text-lg">{y.totalPoints}</strong></span>
+                {/* Name and Points Section */}
+                <div className="text-right w-full xl:w-1/4 border-b-2 xl:border-b-0 border-gray-100 pb-4 xl:pb-0">
+                  <Link href={`/admin/youth/${y.id}`} className="text-2xl font-black text-blue-900 hover:text-blue-600 hover:underline block">{y.name}</Link>
+                  <span className="text-md font-bold text-gray-500 mt-2 block">
+                    الإجمالي: <strong className="text-blue-700 text-3xl mx-2">{y.totalPoints}</strong> نقطة
+                  </span>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 w-full xl:w-1/2 justify-center xl:justify-start mb-4 xl:mb-0">
-                  <button onClick={() => handleAddPoints(y.id, 50, "القداس")} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded shadow-sm font-bold text-sm">+ 50 (قداس)</button>
-                  <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded shadow-sm font-bold text-sm">+ 30 (تسبحة)</button>
-                  <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded shadow-sm font-bold text-sm">+ 20 (عشية)</button>
+                {/* Quick Add Buttons */}
+                <div className="flex flex-wrap gap-2 md:gap-3 w-full xl:w-auto">
+                  <button onClick={() => handleAddPoints(y.id, 50, "القداس")} className="flex-1 md:flex-none bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border-2 border-blue-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">القداس (+50)</button>
+                  <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="flex-1 md:flex-none bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border-2 border-purple-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">التسبحة (+30)</button>
+                  <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="flex-1 md:flex-none bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">العشية (+20)</button>
                 </div>
 
-                <div className="flex flex-row gap-2 w-full xl:w-auto items-center bg-white p-2 rounded border border-gray-300 shadow-inner">
+                {/* Custom Add/Deduct */}
+                <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
                   <input 
-                    type="number" placeholder="رقم (+ أو -)" 
-                    className="border p-2 rounded w-24 text-center font-bold text-sm"
+                    type="number" placeholder="الرقم (+ أو -)" 
+                    className="w-full sm:w-32 border-2 border-gray-400 p-3 rounded-lg text-center font-black text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
                     value={customPoints[y.id] || ""} onChange={e => setCustomPoints({...customPoints, [y.id]: parseInt(e.target.value)})}
                   />
                   <input 
-                    type="text" placeholder="السبب (مكافأة، خصم..)" 
-                    className="border p-2 rounded w-36 text-sm"
+                    type="text" placeholder="السبب (مثال: خصم)" 
+                    className="w-full sm:w-48 border-2 border-gray-400 p-3 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none font-bold"
                     value={customReason[y.id] || ""} onChange={e => setCustomReason({...customReason, [y.id]: e.target.value})}
                   />
                   <button 
                     onClick={() => handleAddPoints(y.id, customPoints[y.id], customReason[y.id])} 
-                    className="bg-gray-800 hover:bg-black text-white px-4 py-2 rounded font-bold text-sm">
-                    تنفيذ
+                    className="w-full sm:w-auto bg-gray-800 hover:bg-black text-white px-6 py-3 rounded-lg font-bold shadow-md transition">
+                    تأكيد
                   </button>
                 </div>
 
               </div>
             ))}
-            {youths.length === 0 && <p className="text-center text-gray-500 py-4">لا يوجد مخدومين مسجلين بعد.</p>}
+            {youths.length === 0 && <p className="text-center text-gray-500 py-10 font-bold text-xl">لا يوجد مخدومين مسجلين بعد.</p>}
           </div>
         </div>
       </div>
