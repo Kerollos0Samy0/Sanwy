@@ -37,18 +37,22 @@ export default function Admin() {
         </div>
         
         {/* Top Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Link href="/admin/scan" className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-6 rounded-2xl shadow-md text-xl text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-4xl mb-3">📷</span>
-            تسجيل الحضور بالكاميرا
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Link href="/admin/scan" className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
+            <span className="text-3xl mb-2">📷</span>
+            الكاميرا (QR)
           </Link>
-          <Link href="/admin/cards" className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 py-6 rounded-2xl shadow-md text-xl text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-4xl mb-3">🖨️</span>
-            طباعة الكارنيهات (QR)
+          <Link href="/admin/cards" className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
+            <span className="text-3xl mb-2">🖨️</span>
+            طباعة الكارنيهات
           </Link>
-          <Link href="/admin/logs" className="bg-gray-800 hover:bg-black text-white font-bold px-4 py-6 rounded-2xl shadow-md text-xl text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-4xl mb-3">📜</span>
-            السجل العام للنقاط
+          <Link href="/dashboard" className="bg-green-600 hover:bg-green-700 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
+            <span className="text-3xl mb-2">📊</span>
+            لوحة الأبطال
+          </Link>
+          <Link href="/admin/logs" className="bg-gray-800 hover:bg-black text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
+            <span className="text-3xl mb-2">📜</span>
+            سجل النقاط
           </Link>
         </div>
         
