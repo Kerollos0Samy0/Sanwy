@@ -11,6 +11,8 @@ model Youth {
   id          String       @id @default(uuid())
   name        String
   grade       String?      
+  dateOfBirth String?
+  imageUrl    String?
   totalPoints Int          @default(0)
   createdAt   DateTime     @default(now())
   pointsLogs  PointsLog[]
