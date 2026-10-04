@@ -35,7 +35,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-10 border-b-2 border-gray-200 pb-6 gap-6">
           <div className="flex items-center gap-4">
-            <img src="/logo.jpg" alt="Logo" className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-white shadow-lg object-cover" />
+            <img src="/logo.png" alt="Logo" className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-white shadow-lg object-cover" />
             <h1 className="text-4xl md:text-5xl font-black text-blue-900 drop-shadow-sm">📊 إحصائيات الأبطال</h1>
           </div>
           <Link href="/admin" className="bg-gray-800 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-md transition whitespace-nowrap">لوحة الخدام &rarr;</Link>

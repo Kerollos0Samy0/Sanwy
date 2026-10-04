@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "ثانوي - القديسة رفقة",
   description: "نظام متابعة نقاط وحضور شباب ثانوي - كنيسة القديسة رفقة",
   icons: {
-    icon: '/logo.jpg',
+    icon: '/logo.png',
   },
 };
 
