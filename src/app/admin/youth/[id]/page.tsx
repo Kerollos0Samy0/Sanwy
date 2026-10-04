@@ -114,8 +114,8 @@ export default function YouthProfile() {
                   <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex-1 shadow-sm hover:shadow-md transition">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
                       <h3 className="text-2xl font-bold text-gray-800">{log.reason}</h3>
-                      <span className="text-sm md:text-base font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-lg shrink-0">
-                        {new Date(log.createdAt).toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                      <span className="text-sm md:text-base font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-lg shrink-0" dir="ltr">
+                        {new Date(log.createdAt).toLocaleString('en-GB')}
                       </span>
                     </div>
                     <p className="text-gray-600 text-base">تم التسجيل بواسطة الخادم: <strong className="text-gray-900">{log.servantName}</strong></p>

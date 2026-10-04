@@ -15,7 +15,7 @@ export default function Efteqad() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "لم يحضر بعد";
-    return new Date(dateString).toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    return new Date(dateString).toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   return (
