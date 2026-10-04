@@ -6,9 +6,12 @@ import { fireConfetti, playSuccessSound } from "@/lib/effects";
 export default function Admin() {
   const [name, setName] = useState("");
   const [grade, setGrade] = useState("أولى ثانوي");
+  const [selectedGrade, setSelectedGrade] = useState("الكل");
   const [youths, setYouths] = useState<any[]>([]);
   const [customPoints, setCustomPoints] = useState<{ [key: string]: number }>({});
   const [customReason, setCustomReason] = useState<{ [key: string]: string }>({});
+
+  const filteredYouths = selectedGrade === "الكل" ? youths : youths.filter(y => y.grade === selectedGrade);
 
   const fetchYouths = () => fetch('/api/youth').then(res => res.json()).then(setYouths);
   useEffect(() => { fetchYouths(); }, []);
@@ -99,9 +102,26 @@ export default function Admin() {
 
         {/* Youth List */}
         <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">قائمة المخدومين (تسجيل الحضور والنقاط)</h2>
+          <div className="flex flex-col md:flex-row justify-between items-center mb-6 border-b pb-4 gap-4">
+            <h2 className="text-2xl font-bold text-gray-800">قائمة المخدومين (تسجيل الحضور والنقاط)</h2>
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <label className="font-bold text-gray-700 whitespace-nowrap">تصفية بالمرحلة:</label>
+              <select 
+                className="flex-1 md:w-48 border-2 border-gray-300 p-2 rounded-xl font-bold text-gray-900 focus:outline-none focus:border-blue-500"
+                value={selectedGrade} onChange={e => setSelectedGrade(e.target.value)}
+              >
+                <option value="الكل">الكل</option>
+                <option value="أولى ثانوي">أولى ثانوي</option>
+                <option value="تانية ثانوي">تانية ثانوي</option>
+                <option value="تالتة ثانوي">تالتة ثانوي</option>
+              </select>
+            </div>
+          </div>
           <div className="grid gap-6">
-            {youths.map(y => (
+            {filteredYouths.length === 0 ? (
+              <div className="text-center text-gray-500 font-bold py-8">لا يوجد مخدومين في هذه المرحلة</div>
+            ) : (
+              filteredYouths.map(y => (
               <div key={y.id} className="flex flex-col xl:flex-row justify-between items-start xl:items-center p-5 bg-white border-2 border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition gap-6">
                 
                 {/* Name and Points Section */}
@@ -140,8 +160,7 @@ export default function Admin() {
                 </div>
 
               </div>
-            ))}
-            {youths.length === 0 && <p className="text-center text-gray-500 py-10 font-bold text-xl">لا يوجد مخدومين مسجلين بعد.</p>}
+            )))}
           </div>
         </div>
       </div>
