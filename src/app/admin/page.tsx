@@ -4,6 +4,7 @@ import Link from "next/link";
 
 export default function Admin() {
   const [name, setName] = useState("");
+  const [grade, setGrade] = useState("أولى ثانوي");
   const [youths, setYouths] = useState<any[]>([]);
   const [customPoints, setCustomPoints] = useState<{ [key: string]: number }>({});
   const [customReason, setCustomReason] = useState<{ [key: string]: string }>({});
@@ -13,7 +14,7 @@ export default function Admin() {
 
   const handleAddYouth = async () => {
     if(!name) return;
-    await fetch('/api/youth', { method: 'POST', body: JSON.stringify({ name, grade: "ثانوي" }) });
+    await fetch('/api/youth', { method: 'POST', body: JSON.stringify({ name, grade }) });
     setName(""); fetchYouths();
   }
 
@@ -68,6 +69,17 @@ export default function Admin() {
               className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
               value={name} onChange={e => setName(e.target.value)} placeholder="اكتب اسم المخدوم هنا..." 
             />
+          </div>
+          <div className="w-full md:w-1/4">
+            <label className="block text-gray-700 font-bold mb-2">المرحلة</label>
+            <select 
+              className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+              value={grade} onChange={e => setGrade(e.target.value)}
+            >
+              <option value="أولى ثانوي">أولى ثانوي</option>
+              <option value="تانية ثانوي">تانية ثانوي</option>
+              <option value="تالتة ثانوي">تالتة ثانوي</option>
+            </select>
           </div>
           <button onClick={handleAddYouth} className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-4 rounded-xl shadow-md text-lg transition">إضافة للقائمة</button>
         </div>
