@@ -33,9 +33,12 @@ export default function Dashboard() {
   return (
     <div dir="rtl" className="min-h-screen bg-slate-50 p-6 md:p-12">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-10 border-b-2 border-gray-200 pb-6">
-          <h1 className="text-4xl md:text-5xl font-black text-blue-900 drop-shadow-sm">📊 لوحة إحصائيات الأبطال</h1>
-          <Link href="/admin" className="bg-gray-800 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-md transition">لوحة الخدام &rarr;</Link>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-10 border-b-2 border-gray-200 pb-6 gap-6">
+          <div className="flex items-center gap-4">
+            <img src="/logo.jpg" alt="Logo" className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-white shadow-lg object-cover" />
+            <h1 className="text-4xl md:text-5xl font-black text-blue-900 drop-shadow-sm">📊 إحصائيات الأبطال</h1>
+          </div>
+          <Link href="/admin" className="bg-gray-800 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-md transition whitespace-nowrap">لوحة الخدام &rarr;</Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">

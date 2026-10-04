@@ -22,7 +22,7 @@ export default function Cards() {
         {youths.map(y => (
           <div key={y.id} className="bg-white border-4 border-blue-900 rounded-2xl p-6 flex flex-col items-center text-center shadow-lg break-inside-avoid relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-24 bg-blue-50 z-0"></div>
-            <img src="/logo.png" alt="Logo" className="h-24 object-contain mb-4 z-10" />
+            <img src="/logo.jpg" alt="Logo" className="h-24 w-24 object-contain mb-4 z-10 rounded-full border-2 border-gray-100 shadow-sm" />
             <h2 className="text-2xl font-bold text-gray-800 mb-4 z-10">{y.name}</h2>
             <div className="bg-white p-3 border-4 border-blue-100 rounded-xl z-10">
               <QRCodeSVG value={y.id} size={150} />
