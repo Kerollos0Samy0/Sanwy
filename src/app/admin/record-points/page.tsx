@@ -144,13 +144,13 @@ export default function RecordPoints() {
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 md:gap-3 w-full xl:w-auto xl:justify-center">
-                  <button onClick={() => handleAddPoints(y.id, 50, "القداس")} className="flex-1 md:flex-none bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">القداس (50/10)</button>
-                  <button onClick={() => handleAddPoints(y.id, 20, "التناول")} className="flex-1 md:flex-none bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">التناول (+20)</button>
-                  <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="flex-1 md:flex-none bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">التسبحة (+30)</button>
-                  <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="flex-1 md:flex-none bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border border-orange-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">العشية (+20)</button>
-                  <button onClick={() => handleAddPoints(y.id, 50, "الخدمة")} className="flex-1 md:flex-none bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">الخدمة (+50)</button>
-                  <button onClick={() => handleAddPoints(y.id, 50, "أعمال رحمة")} className="flex-1 md:flex-none bg-fuchsia-50 hover:bg-fuchsia-600 text-fuchsia-700 hover:text-white border border-fuchsia-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">أعمال رحمة (+50)</button>
+                <div className="grid grid-cols-3 gap-2 md:gap-3 w-full xl:w-auto xl:justify-center">
+                  <button onClick={() => handleAddPoints(y.id, 50, "القداس")} className="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">القداس (50/10)</button>
+                  <button onClick={() => handleAddPoints(y.id, 20, "التناول")} className="bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">التناول (+20)</button>
+                  <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">التسبحة (+30)</button>
+                  <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border border-orange-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">العشية (+20)</button>
+                  <button onClick={() => handleAddPoints(y.id, 50, "الخدمة")} className="bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">الخدمة (+50)</button>
+                  <button onClick={() => handleAddPoints(y.id, 50, "أعمال رحمة")} className="bg-fuchsia-50 hover:bg-fuchsia-600 text-fuchsia-700 hover:text-white border border-fuchsia-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">أعمال رحمة (+50)</button>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2 w-full xl:w-auto items-center bg-gray-50 p-3 rounded-xl border border-gray-200 shadow-inner">
