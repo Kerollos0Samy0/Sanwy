@@ -30,8 +30,19 @@ export default function RecordPoints() {
     return matchesGrade && matchesSearch;
   });
 
-  // Sort by grade
-  filteredYouths.sort((a, b) => (a.grade || "").localeCompare(b.grade || ""));
+  const gradeOrder: Record<string, number> = {
+    'أولى ثانوي': 1, 'أولي ثانوي': 1,
+    'تانية ثانوي': 2, 'ثانية ثانوي': 2,
+    'تالتة ثانوي': 3, 'ثالثة ثانوي': 3,
+  };
+
+  // Sort by grade, then by name
+  filteredYouths.sort((a, b) => {
+    const orderA = gradeOrder[a.grade] || 99;
+    const orderB = gradeOrder[b.grade] || 99;
+    if (orderA !== orderB) return orderA - orderB;
+    return (a.name || "").localeCompare(b.name || "");
+  });
 
   const handleAddPoints = async (id: string, points: number, reason: string) => {
     if (!points || points === 0) return alert("برجاء إدخال عدد نقاط صحيح");
@@ -109,11 +120,19 @@ export default function RecordPoints() {
               <div key={y.id} className="flex flex-col xl:flex-row justify-between items-start xl:items-center p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200 gap-6">
                 
                 <div className="flex items-center gap-4 w-full xl:w-1/3 border-b-2 xl:border-b-0 border-gray-100 pb-4 xl:pb-0">
-                  <img 
-                    src={y.imageUrl || `https://ui-avatars.com/api/?name=${y.name?.split(' ').slice(0, 2).join(' ')}&background=0D8ABC&color=fff&size=100`} 
-                    alt="Avatar" 
-                    className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover"
-                  />
+                  {y.imageUrl ? (
+                    <img 
+                      src={y.imageUrl} 
+                      alt="Avatar" 
+                      className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 bg-blue-50 flex items-center justify-center shrink-0">
+                      <svg className="w-8 h-8 text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </div>
+                  )}
                   <div>
                     <Link href={`/admin/youth/${y.id}`} className="text-2xl font-black text-gray-900 hover:text-blue-600 transition block leading-tight">{y.name}</Link>
                     <div className="flex items-center gap-2 mt-2">

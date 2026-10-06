@@ -30,8 +30,19 @@ export default function Admin() {
     return 'bg-blue-100 text-blue-800 border-blue-200';
   };
 
-  // Sort by grade
-  filteredYouths.sort((a, b) => (a.grade || "").localeCompare(b.grade || ""));
+  const gradeOrder: Record<string, number> = {
+    'أولى ثانوي': 1, 'أولي ثانوي': 1,
+    'تانية ثانوي': 2, 'ثانية ثانوي': 2,
+    'تالتة ثانوي': 3, 'ثالثة ثانوي': 3,
+  };
+
+  // Sort by grade, then by name
+  filteredYouths.sort((a, b) => {
+    const orderA = gradeOrder[a.grade] || 99;
+    const orderB = gradeOrder[b.grade] || 99;
+    if (orderA !== orderB) return orderA - orderB;
+    return (a.name || "").localeCompare(b.name || "");
+  });
 
   return (
     <div dir="rtl" className="min-h-screen bg-slate-100 p-4 md:p-8">
@@ -107,11 +118,19 @@ export default function Admin() {
             ) : (
               filteredYouths.map(y => (
               <Link href={`/admin/youth/${y.id}`} key={y.id} className="flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200">
-                <img 
-                  src={y.imageUrl || `https://ui-avatars.com/api/?name=${y.name?.split(' ').slice(0, 2).join(' ')}&background=0D8ABC&color=fff&size=100`} 
-                  alt="Avatar" 
-                  className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover"
-                />
+                {y.imageUrl ? (
+                  <img 
+                    src={y.imageUrl} 
+                    alt="Avatar" 
+                    className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 bg-blue-50 flex items-center justify-center shrink-0">
+                    <svg className="w-8 h-8 text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                  </div>
+                )}
                 <div>
                   <h3 className="text-xl font-black text-gray-900 block leading-tight">{y.name}</h3>
                   <div className="flex items-center gap-2 mt-2">

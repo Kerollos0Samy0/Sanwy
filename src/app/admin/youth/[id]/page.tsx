@@ -46,11 +46,19 @@ export default function YouthProfile() {
           <div className="bg-gradient-to-r from-blue-900 to-blue-600 h-32 relative"></div>
           <div className="px-6 md:px-10 pb-8 relative">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end -mt-16 mb-6 gap-4">
-              <img 
-                src={youth.imageUrl || `https://ui-avatars.com/api/?name=${youth.name?.split(' ').slice(0, 2).join(' ')}&background=0D8ABC&color=fff&size=200`} 
-                alt="Profile" 
-                className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl bg-white object-cover"
-              />
+              {youth.imageUrl ? (
+                <img 
+                  src={youth.imageUrl} 
+                  alt="Profile" 
+                  className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl bg-white object-cover"
+                />
+              ) : (
+                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl bg-blue-50 flex items-center justify-center">
+                  <svg className="w-16 h-16 md:w-20 md:h-20 text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                </div>
+              )}
               <button onClick={() => setIsEditing(!isEditing)} className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-3 rounded-xl shadow-sm transition">
                 {isEditing ? "إلغاء التعديل ❌" : "تعديل البيانات ✏️"}
               </button>
