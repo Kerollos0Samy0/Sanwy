@@ -8,9 +8,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { name, grade } = body;
+  const { name, grade, gender } = body;
   const youth = await prisma.youth.create({
-    data: { name, grade, totalPoints: 0 }
+    data: { name, grade, gender: gender || "ولد", totalPoints: 0 }
   });
   return NextResponse.json(youth);
 }

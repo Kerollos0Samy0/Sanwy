@@ -12,6 +12,7 @@ model Youth {
   name        String
   grade       String?      
   dateOfBirth String?
+  gender      String       @default("ولد")
   imageUrl    String?
   totalPoints Int          @default(0)
   createdAt   DateTime     @default(now())

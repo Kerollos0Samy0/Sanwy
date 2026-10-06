@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 export default function AddYouth() {
   const [name, setName] = useState("");
   const [grade, setGrade] = useState("أولى ثانوي");
+  const [gender, setGender] = useState("ولد");
   const router = useRouter();
 
   const handleAddYouth = async () => {
     if (!name) return;
-    await fetch('/api/youth', { method: 'POST', body: JSON.stringify({ name, grade }) });
+    await fetch('/api/youth', { method: 'POST', body: JSON.stringify({ name, grade, gender }) });
     alert("تم إضافة المخدوم بنجاح!");
     router.push('/admin');
   };
@@ -31,16 +32,28 @@ export default function AddYouth() {
               value={name} onChange={e => setName(e.target.value)} placeholder="اكتب اسم المخدوم هنا..." 
             />
           </div>
-          <div>
-            <label className="block text-gray-700 font-bold mb-2 text-lg">المرحلة</label>
-            <select 
-              className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-white" 
-              value={grade} onChange={e => setGrade(e.target.value)}
-            >
-              <option value="أولى ثانوي">أولى ثانوي</option>
-              <option value="تانية ثانوي">تانية ثانوي</option>
-              <option value="تالتة ثانوي">تالتة ثانوي</option>
-            </select>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="block text-gray-700 font-bold mb-2 text-lg">المرحلة</label>
+              <select 
+                className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-white" 
+                value={grade} onChange={e => setGrade(e.target.value)}
+              >
+                <option value="أولى ثانوي">أولى ثانوي</option>
+                <option value="تانية ثانوي">تانية ثانوي</option>
+                <option value="تالتة ثانوي">تالتة ثانوي</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="block text-gray-700 font-bold mb-2 text-lg">النوع</label>
+              <select 
+                className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition bg-white" 
+                value={gender} onChange={e => setGender(e.target.value)}
+              >
+                <option value="ولد">ولد</option>
+                <option value="بنت">بنت</option>
+              </select>
+            </div>
           </div>
           
           <button 

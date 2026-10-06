@@ -7,7 +7,7 @@ export default function YouthProfile() {
   const params = useParams();
   const [youth, setYouth] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ name: "", grade: "", dateOfBirth: "", imageUrl: "" });
+  const [editForm, setEditForm] = useState({ name: "", grade: "", gender: "ولد", dateOfBirth: "", imageUrl: "" });
 
   const fetchYouth = () => {
     fetch(`/api/youth/${params.id}`).then(res => res.json()).then(data => {
@@ -15,6 +15,7 @@ export default function YouthProfile() {
       setEditForm({
         name: data.name || "",
         grade: data.grade || "",
+        gender: data.gender || "ولد",
         dateOfBirth: data.dateOfBirth || "",
         imageUrl: data.imageUrl || ""
       });
@@ -43,7 +44,7 @@ export default function YouthProfile() {
         
         {/* Profile Card */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-10 border border-gray-100">
-          <div className="bg-gradient-to-r from-blue-900 to-blue-600 h-32 relative"></div>
+          <div className={`h-32 relative ${youth.gender === 'بنت' ? 'bg-gradient-to-r from-pink-600 to-pink-400' : 'bg-gradient-to-r from-blue-900 to-blue-600'}`}></div>
           <div className="px-6 md:px-10 pb-8 relative">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end -mt-16 mb-6 gap-4">
               {youth.imageUrl ? (
@@ -53,8 +54,8 @@ export default function YouthProfile() {
                   className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl bg-white object-cover"
                 />
               ) : (
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl bg-blue-50 flex items-center justify-center">
-                  <svg className="w-16 h-16 md:w-20 md:h-20 text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                <div className={`w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl flex items-center justify-center ${youth.gender === 'بنت' ? 'bg-pink-50' : 'bg-blue-50'}`}>
+                  <svg className={`w-16 h-16 md:w-20 md:h-20 ${youth.gender === 'بنت' ? 'text-pink-300' : 'text-blue-300'}`} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                   </svg>
                 </div>
@@ -76,6 +77,13 @@ export default function YouthProfile() {
                     <option value="أولى ثانوي">أولى ثانوي</option>
                     <option value="تانية ثانوي">تانية ثانوي</option>
                     <option value="تالتة ثانوي">تالتة ثانوي</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-bold mb-2">النوع</label>
+                  <select className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold" value={editForm.gender} onChange={e => setEditForm({...editForm, gender: e.target.value})}>
+                    <option value="ولد">ولد</option>
+                    <option value="بنت">بنت</option>
                   </select>
                 </div>
                 <div>

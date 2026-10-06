@@ -117,7 +117,7 @@ export default function RecordPoints() {
               <div className="text-center text-gray-500 font-bold py-8">لا يوجد مخدومين في هذه المرحلة</div>
             ) : (
               filteredYouths.map(y => (
-              <div key={y.id} className="flex flex-col xl:flex-row justify-between items-start xl:items-center p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200 gap-6">
+              <div key={y.id} className={`flex flex-col xl:flex-row justify-between items-start xl:items-center p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-200 gap-6 border-r-4 ${y.gender === 'بنت' ? 'border-r-pink-400 hover:border-pink-300' : 'border-r-blue-400 hover:border-blue-300'}`}>
                 
                 <div className="flex items-center gap-4 w-full xl:w-1/3 border-b-2 xl:border-b-0 border-gray-100 pb-4 xl:pb-0">
                   {y.imageUrl ? (
@@ -127,8 +127,8 @@ export default function RecordPoints() {
                       className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover shrink-0"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 bg-blue-50 flex items-center justify-center shrink-0">
-                      <svg className="w-8 h-8 text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                    <div className={`w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 flex items-center justify-center shrink-0 ${y.gender === 'بنت' ? 'bg-pink-50' : 'bg-blue-50'}`}>
+                      <svg className={`w-8 h-8 ${y.gender === 'بنت' ? 'text-pink-300' : 'text-blue-300'}`} fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                       </svg>
                     </div>
