@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import Link from "next/link";
 import { fireConfetti, playSuccessSound } from "@/lib/effects";
@@ -38,7 +38,7 @@ export default function Scan() {
     lastScanTime.current[id] = now;
 
     if (selectedActivities.length === 0) {
-      setLogs(prev => [{ id: Math.random(), msg: `⚠️ يرجى تحديد النشاط أولاً قبل مسح الكارت!`, type: 'error' }, ...prev].slice(0, 5));
+      setLogs(prev => [{ id: Math.random(), msg: `⚠️ يرجى تحديد النشاط أولاً قبل مسح الكارت!`, type: 'error' as 'error' }, ...prev].slice(0, 5));
       return;
     }
 
@@ -47,7 +47,7 @@ export default function Scan() {
       const youthData = await youthRes.json();
       
       if (!youthData || !youthData.name) {
-        setLogs(prev => [{ id: Math.random(), msg: '❌ كود غير صحيح أو مخدوم غير موجود!', type: 'error' }, ...prev].slice(0, 5));
+        setLogs(prev => [{ id: Math.random(), msg: '❌ كود غير صحيح أو مخدوم غير موجود!', type: 'error' as 'error' }, ...prev].slice(0, 5));
         return;
       }
 
@@ -64,11 +64,11 @@ export default function Scan() {
       setLogs(prev => [{ 
         id: Math.random(), 
         msg: `✅ تم تسجيل (${selectedActivities.map(a => a.name).join(' + ')}) لـ: ${youthData.name}`, 
-        type: 'success' 
+        type: 'success' as 'success' 
       }, ...prev].slice(0, 5));
       
     } catch (e) {
-      setLogs(prev => [{ id: Math.random(), msg: '❌ حدث خطأ في الاتصال!', type: 'error' }, ...prev].slice(0, 5));
+      setLogs(prev => [{ id: Math.random(), msg: '❌ حدث خطأ في الاتصال!', type: 'error' as 'error' }, ...prev].slice(0, 5));
     }
   };
 
@@ -143,10 +143,6 @@ export default function Scan() {
               <Scanner 
                 onScan={handleScan} 
                 formats={['qr_code']}
-                components={{
-                  audio: false,
-                  finder: false,
-                }}
               />
               {/* Overlay target box */}
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
