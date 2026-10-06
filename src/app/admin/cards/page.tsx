@@ -32,13 +32,24 @@ export default function Cards() {
       </div>
 
       {/* تصميم ظهر الكارنيه الثابت */}
-      <div className="mb-10">
+      <div className="mb-10 flex flex-col items-center md:items-start">
         <h2 className="text-xl font-bold text-gray-500 mb-4 print-hidden">تصميم ظهر الكارنيه (ثابت)</h2>
-        <div className="w-[9cm] h-[6cm] bg-blue-900 text-white rounded-xl overflow-hidden shadow-md flex flex-col items-center justify-center border border-gray-400 relative">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
-          <img src="/logo.png" alt="Logo" className="w-[2.5cm] h-[2.5cm] object-contain mb-3 bg-white rounded-full p-1 shadow-lg z-10" />
-          <h2 className="text-xl font-black tracking-widest z-10">كنيسة القديسة رفقة</h2>
-          <h3 className="text-sm font-bold text-blue-200 mt-1 z-10">اجتماع شباب ثانوي</h3>
+        <div className="w-[9cm] h-[6cm] bg-gradient-to-br from-blue-900 via-blue-950 to-gray-900 text-white rounded-xl overflow-hidden shadow-lg flex flex-col items-center justify-center border-2 border-gray-300 relative print:border-gray-400">
+          {/* تأثيرات دمج الخلفية */}
+          <div className="absolute top-[-2cm] right-[-2cm] w-[6cm] h-[6cm] bg-blue-500 rounded-full mix-blend-screen filter blur-[40px] opacity-30 z-0"></div>
+          <div className="absolute bottom-[-2cm] left-[-2cm] w-[6cm] h-[6cm] bg-teal-400 rounded-full mix-blend-screen filter blur-[40px] opacity-20 z-0"></div>
+          
+          <div className="bg-white p-1 rounded-full shadow-2xl z-10 mb-2">
+            <img src="/logo.png" alt="Logo" className="w-[2.2cm] h-[2.2cm] object-contain rounded-full" />
+          </div>
+          
+          <h2 className="text-[18px] font-black tracking-widest z-10 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 drop-shadow-sm">
+            كنيسة القديسة رفقة
+          </h2>
+          <div className="w-10 h-1 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full my-1.5 z-10"></div>
+          <h3 className="text-[12px] font-bold text-blue-200 z-10 tracking-wider">
+            اجتماع شباب ثانوي
+          </h3>
         </div>
       </div>
 
@@ -47,41 +58,45 @@ export default function Cards() {
       {/* تصميم وش الكارنيه المتغير */}
       <div>
         <h2 className="text-xl font-bold text-gray-500 mb-4 print-hidden">تصميم وش الكارنيه (متغير)</h2>
-        <div className="flex flex-wrap gap-4 justify-start">
+        <div className="flex flex-wrap gap-6 justify-center md:justify-start">
           {youths.map(y => (
-            <div key={y.id} className="w-[9cm] h-[6cm] bg-white border border-gray-400 rounded-xl overflow-hidden shadow-sm flex flex-row relative break-inside-avoid">
+            <div key={y.id} className="w-[9cm] h-[6cm] bg-white rounded-xl overflow-hidden shadow-md flex flex-row relative border-2 border-gray-200 print:border-gray-300 break-inside-avoid">
               
-              {/* Left Section: QR Code */}
-              <div className="w-[3.5cm] h-full bg-blue-50 flex flex-col items-center justify-center border-l-2 border-blue-100">
-                <div className="bg-white p-1 rounded-lg shadow-sm">
-                  <QRCodeSVG value={y.id} size={85} />
-                </div>
-              </div>
+              {/* تأثيرات دمج الخلفية (وش الكارنيه) */}
+              <div className="absolute top-[-2cm] right-[-2cm] w-[6cm] h-[6cm] bg-blue-100 rounded-full mix-blend-multiply filter blur-2xl opacity-80 z-0"></div>
+              <div className="absolute bottom-[-2cm] left-[-2cm] w-[6cm] h-[6cm] bg-teal-50 rounded-full mix-blend-multiply filter blur-2xl opacity-80 z-0"></div>
+              
+              {/* Watermark Logo */}
+              <img src="/logo.png" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[4cm] h-[4cm] opacity-[0.03] object-contain z-0 grayscale" />
 
-              {/* Right Section: Details */}
-              <div className="flex-1 h-full flex flex-col relative">
-                {/* Header */}
-                <div className="bg-blue-900 text-white text-center py-1.5 text-xs font-bold w-full shadow-sm z-10">
-                  اجتماع شباب ثانوي
-                </div>
+              {/* الناحية اليمين: الصورة والاسم */}
+              <div className="w-[5.5cm] h-full flex flex-col justify-center items-center relative z-10 pl-1 pr-2">
                 
-                {/* Body */}
-                <div className="flex-1 flex flex-col items-center justify-center p-2 relative">
-                  {/* Watermark Logo */}
-                  <img src="/logo.png" className="absolute w-[3cm] h-[3cm] opacity-5 object-contain z-0" />
-                  
-                  {/* Profile Photo */}
-                  <div className={`w-[2.2cm] h-[2.2cm] rounded-full overflow-hidden border-2 mb-2 ${y.gender === 'بنت' ? 'border-pink-500' : 'border-blue-500'} shadow-sm flex items-center justify-center bg-white z-10`}>
+                {/* إطار الصورة المدمج */}
+                <div className={`relative w-[2.6cm] h-[2.6cm] rounded-full p-1 mb-2 shadow-sm bg-gradient-to-tr ${y.gender === 'بنت' ? 'from-pink-400 to-rose-200' : 'from-blue-600 to-teal-300'}`}>
+                  <div className="w-full h-full rounded-full overflow-hidden bg-white border-2 border-white flex items-center justify-center">
                     {y.imageUrl ? (
                       <img src={y.imageUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                      <img src="/logo.png" className="w-full h-full object-contain p-2 opacity-50" />
+                      <img src="/logo.png" className="w-3/4 h-3/4 object-contain opacity-40" />
                     )}
                   </div>
-                  
-                  {/* Name & Grade */}
-                  <h2 className="text-[14px] font-black text-gray-900 text-center leading-tight mb-1 z-10 px-1">{y.name}</h2>
-                  <p className="text-[11px] font-bold text-blue-800 bg-blue-100 px-3 py-0.5 rounded-full z-10 border border-blue-200">{y.grade}</p>
+                </div>
+                
+                {/* الاسم */}
+                <h2 className="text-[15px] font-black text-gray-900 text-center leading-tight">
+                  {y.name}
+                </h2>
+                
+                {/* خط زخرفي بدل المرحلة */}
+                <div className={`w-12 h-1 rounded-full mt-1.5 mb-1 bg-gradient-to-r ${y.gender === 'بنت' ? 'from-pink-400 to-rose-300' : 'from-blue-500 to-teal-400'}`}></div>
+                <p className="text-[10px] font-bold text-gray-500">اجتماع شباب ثانوي</p>
+              </div>
+
+              {/* الناحية الشمال: كود QR */}
+              <div className="w-[3.5cm] h-full flex items-center justify-center relative z-10 pl-2">
+                <div className="bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col items-center">
+                  <QRCodeSVG value={y.id} size={78} />
                 </div>
               </div>
 
