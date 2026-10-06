@@ -4,23 +4,20 @@ import Link from "next/link";
 import { fireConfetti, playSuccessSound } from "@/lib/effects";
 
 export default function Admin() {
-  const [name, setName] = useState("");
-  const [grade, setGrade] = useState("أولى ثانوي");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("الكل");
   const [youths, setYouths] = useState<any[]>([]);
   const [customPoints, setCustomPoints] = useState<{ [key: string]: number }>({});
   const [customReason, setCustomReason] = useState<{ [key: string]: string }>({});
 
-  const filteredYouths = selectedGrade === "الكل" ? youths : youths.filter(y => y.grade === selectedGrade);
+  const filteredYouths = youths.filter(y => {
+    const matchesGrade = selectedGrade === "الكل" || y.grade === selectedGrade;
+    const matchesSearch = y.name.includes(searchQuery);
+    return matchesGrade && matchesSearch;
+  });
 
   const fetchYouths = () => fetch('/api/youth').then(res => res.json()).then(setYouths);
   useEffect(() => { fetchYouths(); }, []);
-
-  const handleAddYouth = async () => {
-    if(!name) return;
-    await fetch('/api/youth', { method: 'POST', body: JSON.stringify({ name, grade }) });
-    setName(""); fetchYouths();
-  }
 
   const handleAddPoints = async (id: string, points: number, reason: string) => {
     if (!points || points === 0) return alert("برجاء إدخال عدد نقاط صحيح");
@@ -51,6 +48,9 @@ export default function Admin() {
             <img src="/logo.png" alt="Logo" className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white shadow-md object-cover" />
             <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900">لوحة تحكم الخدام</h1>
           </div>
+          <Link href="/admin/add-youth" className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition whitespace-nowrap">
+            + إضافة مخدوم
+          </Link>
         </div>
         
         {/* Top Action Buttons */}
@@ -77,27 +77,14 @@ export default function Admin() {
           </Link>
         </div>
         
-        {/* Add New Youth Form */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-end border border-gray-200">
-          <div className="flex-1 w-full">
-            <label className="block text-gray-700 font-bold mb-2">إضافة مخدوم جديد</label>
-            <input 
-              className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
-              value={name} onChange={e => setName(e.target.value)} placeholder="اكتب اسم المخدوم هنا..." 
-            />
-          </div>
-          <div className="w-full md:w-1/4">
-            <label className="block text-gray-700 font-bold mb-2">المرحلة</label>
-            <select 
-              className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
-              value={grade} onChange={e => setGrade(e.target.value)}
-            >
-              <option value="أولى ثانوي">أولى ثانوي</option>
-              <option value="تانية ثانوي">تانية ثانوي</option>
-              <option value="تالتة ثانوي">تالتة ثانوي</option>
-            </select>
-          </div>
-          <button onClick={handleAddYouth} className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-4 rounded-xl shadow-md text-lg transition">إضافة للقائمة</button>
+        {/* Search Bar */}
+        <div className="bg-white p-4 rounded-2xl shadow-sm mb-8 border border-gray-200">
+          <input 
+            type="text"
+            className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+            value={searchQuery} onChange={e => setSearchQuery(e.target.value)} 
+            placeholder="🔍 ابحث عن مخدوم بالاسم..." 
+          />
         </div>
 
         {/* Youth List */}
