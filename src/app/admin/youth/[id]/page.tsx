@@ -69,11 +69,11 @@ export default function YouthProfile() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
                 <div>
                   <label className="block text-gray-700 font-bold mb-2">الاسم</label>
-                  <input className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
+                  <input className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-gray-700 font-bold mb-2">المرحلة</label>
-                  <select className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold" value={editForm.grade} onChange={e => setEditForm({...editForm, grade: e.target.value})}>
+                  <select className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white" value={editForm.grade} onChange={e => setEditForm({...editForm, grade: e.target.value})}>
                     <option value="أولى ثانوي">أولى ثانوي</option>
                     <option value="تانية ثانوي">تانية ثانوي</option>
                     <option value="تالتة ثانوي">تالتة ثانوي</option>
@@ -81,21 +81,63 @@ export default function YouthProfile() {
                 </div>
                 <div>
                   <label className="block text-gray-700 font-bold mb-2">النوع</label>
-                  <select className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold" value={editForm.gender} onChange={e => setEditForm({...editForm, gender: e.target.value})}>
+                  <select className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white" value={editForm.gender} onChange={e => setEditForm({...editForm, gender: e.target.value})}>
                     <option value="ولد">ولد</option>
                     <option value="بنت">بنت</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-gray-700 font-bold mb-2">تاريخ الميلاد</label>
-                  <input type="date" className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-700" value={editForm.dateOfBirth} onChange={e => setEditForm({...editForm, dateOfBirth: e.target.value})} />
+                  <input type="date" className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900" value={editForm.dateOfBirth} onChange={e => setEditForm({...editForm, dateOfBirth: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-bold mb-2">رابط الصورة (URL)</label>
-                  <input placeholder="https://..." className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none text-left font-mono" dir="ltr" value={editForm.imageUrl} onChange={e => setEditForm({...editForm, imageUrl: e.target.value})} />
-                  <p className="text-xs text-gray-500 mt-1">حط رابط الصورة أونلاين عشان تتعرض</p>
+                  <label className="block text-gray-700 font-bold mb-2">رفع صورة شخصية</label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    className="w-full border-2 border-gray-300 p-2 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                          const canvas = document.createElement('canvas');
+                          const MAX_WIDTH = 300;
+                          const MAX_HEIGHT = 300;
+                          let width = img.width;
+                          let height = img.height;
+                          
+                          if (width > height) {
+                            if (width > MAX_WIDTH) {
+                              height *= MAX_WIDTH / width;
+                              width = MAX_WIDTH;
+                            }
+                          } else {
+                            if (height > MAX_HEIGHT) {
+                              width *= MAX_HEIGHT / height;
+                              height = MAX_HEIGHT;
+                            }
+                          }
+                          canvas.width = width;
+                          canvas.height = height;
+                          const ctx = canvas.getContext('2d');
+                          ctx?.drawImage(img, 0, 0, width, height);
+                          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                          setEditForm({...editForm, imageUrl: compressedBase64});
+                        };
+                        img.src = event.target?.result as string;
+                      };
+                      reader.readAsDataURL(file);
+                    }} 
+                  />
+                  <p className="text-xs text-gray-500 mt-1">سيتم تصغير الصورة تلقائياً لتوفير المساحة</p>
                 </div>
-                <div className="md:col-span-2 text-left mt-2">
+                <div className="md:col-span-2 text-left mt-2 flex items-center justify-end gap-4">
+                  {editForm.imageUrl && editForm.imageUrl.startsWith('data:image') && (
+                    <span className="text-green-600 font-bold text-sm">تم تجهيز الصورة بنجاح ✅</span>
+                  )}
                   <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl shadow-md transition text-lg">حفظ التغييرات ✅</button>
                 </div>
               </div>
