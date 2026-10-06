@@ -30,52 +30,28 @@ export default function Admin() {
     return 'bg-blue-100 text-blue-800 border-blue-200';
   };
 
-  const handleAddPoints = async (id: string, points: number, reason: string) => {
-    if (!points || points === 0) return alert("برجاء إدخال عدد نقاط صحيح");
-    if (!reason) return alert("برجاء إدخال السبب");
-    const res = await fetch('/api/points', {
-      method: 'POST',
-      body: JSON.stringify({ youthId: id, reason, points, servantName: currentServant || "أدمن" })
-    });
-    
-    // Play Effects!
-    playSuccessSound();
-    fireConfetti();
-
-    const data = await res.json();
-    if (reason === "القداس") {
-      alert(`تم إضافة ${data.log.points} نقطة للقداس (حسب التكرار هذا الأسبوع)`);
-    }
-    setCustomPoints(prev => ({...prev, [id]: 0}));
-    setCustomReason(prev => ({...prev, [id]: ""}));
-    fetchYouths();
-  }
+  // Sort by grade
+  filteredYouths.sort((a, b) => (a.grade || "").localeCompare(b.grade || ""));
 
   return (
     <div dir="rtl" className="min-h-screen bg-slate-100 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6 border-b-2 border-gray-200 pb-4 gap-4">
-          <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex justify-between items-center mb-6 border-b-2 border-gray-200 pb-4 gap-4 flex-wrap">
+          <div className="flex items-center gap-4">
             <img src="/logo.png" alt="Logo" className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white shadow-md object-cover" />
             <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900">لوحة تحكم الخدام</h1>
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200 ml-auto">
-              <label className="text-gray-600 font-bold text-sm whitespace-nowrap">اسم الخادم:</label>
-              <input 
-                type="text" 
-                value={currentServant} 
-                onChange={(e) => setCurrentServant(e.target.value)}
-                className="w-24 md:w-40 border-b-2 border-blue-200 focus:border-blue-500 outline-none text-blue-900 font-bold bg-transparent"
-                placeholder="اسمك..."
-              />
-            </div>
           </div>
-          <Link href="/admin/add-youth" className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition whitespace-nowrap">
+          <Link href="/admin/add-youth" className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition whitespace-nowrap ml-auto md:ml-0">
             + إضافة مخدوم
           </Link>
         </div>
         
         {/* Top Action Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <Link href="/admin/record-points" className="flex-1 min-w-[140px] bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
+            <span className="text-3xl mb-2">✍️</span>
+            تسجيل النقاط
+          </Link>
           <Link href="/admin/scan" className="flex-1 min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
             <span className="text-3xl mb-2">📷</span>
             الكاميرا (QR)
@@ -111,7 +87,7 @@ export default function Admin() {
         {/* Youth List */}
         <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 border-b pb-4 gap-4">
-            <h2 className="text-2xl font-bold text-gray-800">قائمة المخدومين (تسجيل الحضور والنقاط)</h2>
+            <h2 className="text-2xl font-bold text-gray-800">قائمة المخدومين (الدليل)</h2>
             <div className="flex items-center gap-3 w-full md:w-auto">
               <label className="font-bold text-gray-700 whitespace-nowrap">تصفية بالمرحلة:</label>
               <select 
@@ -125,60 +101,27 @@ export default function Admin() {
               </select>
             </div>
           </div>
-          <div className="grid gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredYouths.length === 0 ? (
-              <div className="text-center text-gray-500 font-bold py-8">لا يوجد مخدومين في هذه المرحلة</div>
+              <div className="col-span-full text-center text-gray-500 font-bold py-8">لا يوجد مخدومين في هذه المرحلة</div>
             ) : (
               filteredYouths.map(y => (
-              <div key={y.id} className="flex flex-col xl:flex-row justify-between items-start xl:items-center p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200 gap-6">
-                
-                {/* Name and Profile Section */}
-                <div className="flex items-center gap-4 w-full xl:w-1/3 border-b-2 xl:border-b-0 border-gray-100 pb-4 xl:pb-0">
-                  <img 
-                    src={y.imageUrl || `https://ui-avatars.com/api/?name=${y.name?.split(' ').slice(0, 2).join(' ')}&background=0D8ABC&color=fff&size=100`} 
-                    alt="Avatar" 
-                    className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover"
-                  />
-                  <div>
-                    <Link href={`/admin/youth/${y.id}`} className="text-2xl font-black text-gray-900 hover:text-blue-600 transition block leading-tight">{y.name}</Link>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={`text-xs font-bold px-2 py-1 rounded-md border ${getGradeColor(y.grade)}`}>{y.grade || 'غير محدد'}</span>
-                      <span className="text-sm font-bold text-gray-500">
-                        <strong className="text-blue-700 text-xl mx-1">{y.totalPoints}</strong> نقطة
-                      </span>
-                    </div>
+              <Link href={`/admin/youth/${y.id}`} key={y.id} className="flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200">
+                <img 
+                  src={y.imageUrl || `https://ui-avatars.com/api/?name=${y.name?.split(' ').slice(0, 2).join(' ')}&background=0D8ABC&color=fff&size=100`} 
+                  alt="Avatar" 
+                  className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover"
+                />
+                <div>
+                  <h3 className="text-xl font-black text-gray-900 block leading-tight">{y.name}</h3>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md border ${getGradeColor(y.grade)}`}>{y.grade || 'غير محدد'}</span>
+                    <span className="text-sm font-bold text-gray-500">
+                      <strong className="text-blue-700 text-lg mx-1">{y.totalPoints}</strong> نقطة
+                    </span>
                   </div>
                 </div>
-                
-                {/* Quick Add Buttons */}
-                <div className="flex flex-wrap gap-2 md:gap-3 w-full xl:w-auto xl:justify-center">
-                  <button onClick={() => handleAddPoints(y.id, 50, "القداس")} className="flex-1 md:flex-none bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">القداس (50/10)</button>
-                  <button onClick={() => handleAddPoints(y.id, 20, "التناول")} className="flex-1 md:flex-none bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">التناول (+20)</button>
-                  <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="flex-1 md:flex-none bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">التسبحة (+30)</button>
-                  <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="flex-1 md:flex-none bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border border-orange-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">العشية (+20)</button>
-                  <button onClick={() => handleAddPoints(y.id, 50, "الخدمة")} className="flex-1 md:flex-none bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">الخدمة (+50)</button>
-                </div>
-
-                {/* Custom Add/Deduct */}
-                <div className="flex flex-col sm:flex-row gap-2 w-full xl:w-auto items-center bg-gray-50 p-3 rounded-xl border border-gray-200 shadow-inner">
-                  <input 
-                    type="number" placeholder="الرقم" 
-                    className="w-full sm:w-24 border border-gray-300 p-2 rounded-lg text-center font-black text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-                    value={customPoints[y.id] || ""} onChange={e => setCustomPoints({...customPoints, [y.id]: parseInt(e.target.value)})}
-                  />
-                  <input 
-                    type="text" placeholder="السبب (مثال: خصم)" 
-                    className="w-full sm:w-36 border border-gray-300 p-2 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none font-bold text-sm"
-                    value={customReason[y.id] || ""} onChange={e => setCustomReason({...customReason, [y.id]: e.target.value})}
-                  />
-                  <button 
-                    onClick={() => handleAddPoints(y.id, customPoints[y.id], customReason[y.id])} 
-                    className="w-full sm:w-auto bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-lg font-bold shadow-sm transition text-sm">
-                    تأكيد
-                  </button>
-                </div>
-
-              </div>
+              </Link>
             )))}
           </div>
         </div>
