@@ -6,6 +6,7 @@ import { fireConfetti, playSuccessSound } from "@/lib/effects";
 export default function Admin() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("الكل");
+  const [currentServant, setCurrentServant] = useState("أدمن");
   const [youths, setYouths] = useState<any[]>([]);
   const [customPoints, setCustomPoints] = useState<{ [key: string]: number }>({});
   const [customReason, setCustomReason] = useState<{ [key: string]: string }>({});
@@ -24,7 +25,7 @@ export default function Admin() {
     if (!reason) return alert("برجاء إدخال السبب");
     const res = await fetch('/api/points', {
       method: 'POST',
-      body: JSON.stringify({ youthId: id, reason, points, servantName: "أدمن" })
+      body: JSON.stringify({ youthId: id, reason, points, servantName: currentServant || "أدمن" })
     });
     
     // Play Effects!
@@ -44,9 +45,19 @@ export default function Admin() {
     <div dir="rtl" className="min-h-screen bg-slate-100 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6 border-b-2 border-gray-200 pb-4 gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <img src="/logo.png" alt="Logo" className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white shadow-md object-cover" />
             <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900">لوحة تحكم الخدام</h1>
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200 ml-auto">
+              <label className="text-gray-600 font-bold text-sm whitespace-nowrap">اسم الخادم:</label>
+              <input 
+                type="text" 
+                value={currentServant} 
+                onChange={(e) => setCurrentServant(e.target.value)}
+                className="w-24 md:w-40 border-b-2 border-blue-200 focus:border-blue-500 outline-none text-blue-900 font-bold bg-transparent"
+                placeholder="اسمك..."
+              />
+            </div>
           </div>
           <Link href="/admin/add-youth" className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition whitespace-nowrap">
             + إضافة مخدوم
