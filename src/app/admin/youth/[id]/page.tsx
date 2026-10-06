@@ -47,7 +47,7 @@ export default function YouthProfile() {
           <div className="px-6 md:px-10 pb-8 relative">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end -mt-16 mb-6 gap-4">
               <img 
-                src={youth.imageUrl || `https://ui-avatars.com/api/?name=${youth.name}&background=0D8ABC&color=fff&size=200`} 
+                src={youth.imageUrl || `https://ui-avatars.com/api/?name=${youth.name?.split(' ').slice(0, 2).join(' ')}&background=0D8ABC&color=fff&size=200`} 
                 alt="Profile" 
                 className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl bg-white object-cover"
               />
@@ -88,7 +88,11 @@ export default function YouthProfile() {
                 <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">{youth.name}</h1>
                 <div className="flex flex-wrap gap-4 text-gray-700 font-bold text-lg mb-4">
                   <span className="bg-gray-100 px-4 py-2 rounded-xl flex items-center gap-2">🎓 {youth.grade}</span>
-                  <span className="bg-gray-100 px-4 py-2 rounded-xl flex items-center gap-2">🎂 {youth.dateOfBirth ? new Date(youth.dateOfBirth).toLocaleDateString('ar-EG') : 'تاريخ الميلاد غير مسجل'}</span>
+                  <span className="bg-gray-100 px-4 py-2 rounded-xl flex items-center gap-2">🎂 {
+                    youth.dateOfBirth 
+                      ? (youth.dateOfBirth.includes('/') ? youth.dateOfBirth : new Date(youth.dateOfBirth).toLocaleDateString('ar-EG')) 
+                      : 'تاريخ الميلاد غير مسجل'
+                  }</span>
                   <span className="bg-blue-100 text-blue-900 px-4 py-2 rounded-xl flex items-center gap-2">⭐ {youth.totalPoints} نقطة</span>
                 </div>
               </div>
