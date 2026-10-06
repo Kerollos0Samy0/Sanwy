@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 export default function Leaderboard() {
-  const [youths, setYouths] = useState<any[]>([]);
+  const [youths, setYouths] = useState<{id: string, name: string, totalPoints: number}[]>([]);
 
   useEffect(() => {
     const fetchLeaderboard = () => {

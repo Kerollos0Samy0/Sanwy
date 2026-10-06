@@ -12,9 +12,9 @@ export const fireConfetti = () => {
 
 export const playSuccessSound = () => {
   try {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
     
     // Play a "coin collect" dual-tone sound
     const osc1 = ctx.createOscillator();
