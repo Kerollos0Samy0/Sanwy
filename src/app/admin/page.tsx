@@ -20,6 +20,16 @@ export default function Admin() {
   const fetchYouths = () => fetch('/api/youth').then(res => res.json()).then(setYouths);
   useEffect(() => { fetchYouths(); }, []);
 
+  const allGrades = Array.from(new Set(youths.map(y => y.grade).filter(Boolean)));
+
+  const getGradeColor = (grade: string) => {
+    if (!grade) return 'bg-gray-100 text-gray-800 border-gray-200';
+    if (grade.includes('أول')) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+    if (grade.includes('ثاني')) return 'bg-amber-100 text-amber-800 border-amber-200';
+    if (grade.includes('تالت') || grade.includes('ثالث')) return 'bg-purple-100 text-purple-800 border-purple-200';
+    return 'bg-blue-100 text-blue-800 border-blue-200';
+  };
+
   const handleAddPoints = async (id: string, points: number, reason: string) => {
     if (!points || points === 0) return alert("برجاء إدخال عدد نقاط صحيح");
     if (!reason) return alert("برجاء إدخال السبب");
@@ -109,9 +119,9 @@ export default function Admin() {
                 value={selectedGrade} onChange={e => setSelectedGrade(e.target.value)}
               >
                 <option value="الكل">الكل</option>
-                <option value="أولى ثانوي">أولى ثانوي</option>
-                <option value="تانية ثانوي">تانية ثانوي</option>
-                <option value="تالتة ثانوي">تالتة ثانوي</option>
+                {allGrades.map((g: any) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
               </select>
             </div>
           </div>
@@ -120,40 +130,50 @@ export default function Admin() {
               <div className="text-center text-gray-500 font-bold py-8">لا يوجد مخدومين في هذه المرحلة</div>
             ) : (
               filteredYouths.map(y => (
-              <div key={y.id} className="flex flex-col xl:flex-row justify-between items-start xl:items-center p-5 bg-white border-2 border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition gap-6">
+              <div key={y.id} className="flex flex-col xl:flex-row justify-between items-start xl:items-center p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200 gap-6">
                 
-                {/* Name and Points Section */}
-                <div className="text-right w-full xl:w-1/4 border-b-2 xl:border-b-0 border-gray-100 pb-4 xl:pb-0">
-                  <Link href={`/admin/youth/${y.id}`} className="text-2xl font-black text-blue-900 hover:text-blue-600 hover:underline block">{y.name}</Link>
-                  <span className="text-md font-bold text-gray-500 mt-2 block">
-                    الإجمالي: <strong className="text-blue-700 text-3xl mx-2">{y.totalPoints}</strong> نقطة
-                  </span>
+                {/* Name and Profile Section */}
+                <div className="flex items-center gap-4 w-full xl:w-1/3 border-b-2 xl:border-b-0 border-gray-100 pb-4 xl:pb-0">
+                  <img 
+                    src={y.imageUrl || `https://ui-avatars.com/api/?name=${y.name?.split(' ').slice(0, 2).join(' ')}&background=0D8ABC&color=fff&size=100`} 
+                    alt="Avatar" 
+                    className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover"
+                  />
+                  <div>
+                    <Link href={`/admin/youth/${y.id}`} className="text-2xl font-black text-gray-900 hover:text-blue-600 transition block leading-tight">{y.name}</Link>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className={`text-xs font-bold px-2 py-1 rounded-md border ${getGradeColor(y.grade)}`}>{y.grade || 'غير محدد'}</span>
+                      <span className="text-sm font-bold text-gray-500">
+                        <strong className="text-blue-700 text-xl mx-1">{y.totalPoints}</strong> نقطة
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 
                 {/* Quick Add Buttons */}
-                <div className="flex flex-wrap gap-2 md:gap-3 w-full xl:w-auto">
-                  <button onClick={() => handleAddPoints(y.id, 50, "القداس")} className="flex-1 md:flex-none bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border-2 border-blue-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">القداس (50/10)</button>
-                  <button onClick={() => handleAddPoints(y.id, 20, "التناول")} className="flex-1 md:flex-none bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border-2 border-teal-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">التناول (+20)</button>
-                  <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="flex-1 md:flex-none bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border-2 border-purple-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">التسبحة (+30)</button>
-                  <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="flex-1 md:flex-none bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border-2 border-orange-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">العشية (+20)</button>
-                  <button onClick={() => handleAddPoints(y.id, 50, "الخدمة")} className="flex-1 md:flex-none bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border-2 border-rose-200 px-5 py-3 rounded-xl font-bold text-sm md:text-base transition">الخدمة (+50)</button>
+                <div className="flex flex-wrap gap-2 md:gap-3 w-full xl:w-auto xl:justify-center">
+                  <button onClick={() => handleAddPoints(y.id, 50, "القداس")} className="flex-1 md:flex-none bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">القداس (50/10)</button>
+                  <button onClick={() => handleAddPoints(y.id, 20, "التناول")} className="flex-1 md:flex-none bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">التناول (+20)</button>
+                  <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="flex-1 md:flex-none bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">التسبحة (+30)</button>
+                  <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="flex-1 md:flex-none bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border border-orange-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">العشية (+20)</button>
+                  <button onClick={() => handleAddPoints(y.id, 50, "الخدمة")} className="flex-1 md:flex-none bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">الخدمة (+50)</button>
                 </div>
 
                 {/* Custom Add/Deduct */}
-                <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <div className="flex flex-col sm:flex-row gap-2 w-full xl:w-auto items-center bg-gray-50 p-3 rounded-xl border border-gray-200 shadow-inner">
                   <input 
-                    type="number" placeholder="الرقم (+ أو -)" 
-                    className="w-full sm:w-32 border-2 border-gray-400 p-3 rounded-lg text-center font-black text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                    type="number" placeholder="الرقم" 
+                    className="w-full sm:w-24 border border-gray-300 p-2 rounded-lg text-center font-black text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
                     value={customPoints[y.id] || ""} onChange={e => setCustomPoints({...customPoints, [y.id]: parseInt(e.target.value)})}
                   />
                   <input 
                     type="text" placeholder="السبب (مثال: خصم)" 
-                    className="w-full sm:w-48 border-2 border-gray-400 p-3 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none font-bold"
+                    className="w-full sm:w-36 border border-gray-300 p-2 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none font-bold text-sm"
                     value={customReason[y.id] || ""} onChange={e => setCustomReason({...customReason, [y.id]: e.target.value})}
                   />
                   <button 
                     onClick={() => handleAddPoints(y.id, customPoints[y.id], customReason[y.id])} 
-                    className="w-full sm:w-auto bg-gray-800 hover:bg-black text-white px-6 py-3 rounded-lg font-bold shadow-md transition">
+                    className="w-full sm:w-auto bg-gray-800 hover:bg-black text-white px-4 py-2 rounded-lg font-bold shadow-sm transition text-sm">
                     تأكيد
                   </button>
                 </div>
