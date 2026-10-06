@@ -16,6 +16,7 @@ export default function Scan() {
     { id: 'tasbeha', name: 'التسبحة', defaultPoints: 30, color: 'bg-purple-100 text-purple-800 border-purple-400' },
     { id: 'vespers', name: 'العشية', defaultPoints: 20, color: 'bg-orange-100 text-orange-800 border-orange-400' },
     { id: 'service', name: 'الخدمة', defaultPoints: 50, color: 'bg-rose-100 text-rose-800 border-rose-400' },
+    { id: 'mercy', name: 'أعمال رحمة', defaultPoints: 50, color: 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-400' },
   ];
 
   const toggleActivity = (act: any) => {

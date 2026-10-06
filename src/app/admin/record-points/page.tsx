@@ -150,6 +150,7 @@ export default function RecordPoints() {
                   <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="flex-1 md:flex-none bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">التسبحة (+30)</button>
                   <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="flex-1 md:flex-none bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border border-orange-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">العشية (+20)</button>
                   <button onClick={() => handleAddPoints(y.id, 50, "الخدمة")} className="flex-1 md:flex-none bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">الخدمة (+50)</button>
+                  <button onClick={() => handleAddPoints(y.id, 50, "أعمال رحمة")} className="flex-1 md:flex-none bg-fuchsia-50 hover:bg-fuchsia-600 text-fuchsia-700 hover:text-white border border-fuchsia-200 px-4 py-3 rounded-xl font-bold text-sm md:text-base transition">أعمال رحمة (+50)</button>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2 w-full xl:w-auto items-center bg-gray-50 p-3 rounded-xl border border-gray-200 shadow-inner">
