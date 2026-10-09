@@ -23,11 +23,16 @@ export default function Cards() {
     <div dir="rtl" className="p-4 md:p-8 bg-gray-100 min-h-screen">
       <style>{`
         @media print {
-          @page { margin: 10mm; }
+          @page { 
+            size: ${isWhatsappMode ? '9cm 6cm' : 'A4'}; 
+            margin: 0; 
+          }
           body { 
             -webkit-print-color-adjust: exact !important; 
             print-color-adjust: exact !important; 
             background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
           .print-hidden { display: none !important; }
         }
@@ -76,8 +81,8 @@ export default function Cards() {
         <h2 className="text-xl font-bold text-gray-500 mb-4 print-hidden">تصميم وش الكارنيه (متغير)</h2>
         <div className="flex flex-wrap gap-6 justify-center md:justify-start">
           {youths.map(y => (
-            <div key={y.id} className={isWhatsappMode ? 'print:w-full print:h-[95vh] print:flex print:items-center print:justify-center print:break-after-page' : ''}>
-              <div id={`card-${y.id}`} className="group w-[9cm] h-[6cm] bg-white rounded-xl overflow-hidden shadow-md flex flex-row relative border-2 border-gray-200 print:border-gray-300 break-inside-avoid">
+            <div key={y.id} className={isWhatsappMode ? 'print:break-after-page print:m-0 print:p-0' : ''}>
+              <div id={`card-${y.id}`} className="group w-[9cm] h-[6cm] bg-white rounded-xl overflow-hidden shadow-md flex flex-row relative border-2 border-gray-200 print:border-none print:shadow-none break-inside-avoid print:m-0">
                 
                 {/* تأثيرات دمج الخلفية (وش الكارنيه) */}
                 <div className="absolute top-[-2cm] right-[-2cm] w-[6cm] h-[6cm] bg-blue-100 rounded-full mix-blend-multiply filter blur-2xl opacity-80 z-0"></div>
