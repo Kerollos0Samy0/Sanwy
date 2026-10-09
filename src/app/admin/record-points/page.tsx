@@ -44,19 +44,38 @@ export default function RecordPoints() {
     return (a.name || "").localeCompare(b.name || "");
   });
 
-  const handleAddPoints = async (id: string, points: number, reason: string) => {
+  const handleAddPoints = async (id: string, points: number, reason: string, force = false) => {
     if (!points || points === 0) return alert("برجاء إدخال عدد نقاط صحيح");
     if (!reason) return alert("برجاء إدخال السبب");
+    
     const res = await fetch('/api/points', {
       method: 'POST',
-      body: JSON.stringify({ youthId: id, reason, points, servantName: currentServant || "أدمن" })
+      body: JSON.stringify({ 
+        youthId: id, 
+        reason, 
+        points, 
+        servantName: currentServant || "أدمن",
+        preventDuplicateToday: !force
+      })
     });
     
+    if (!res.ok) {
+      const err = await res.json();
+      if (err.error === 'duplicate_today') {
+        const confirmForce = window.confirm(`⚠️ المخدوم متسجله "${reason}" النهاردة قبل كدة!\nهل متأكد إنك عايز تسجلها مرة تانية؟`);
+        if (confirmForce) {
+          return handleAddPoints(id, points, reason, true);
+        }
+        return;
+      }
+      return alert("حدث خطأ في التسجيل");
+    }
+
     playSuccessSound();
     fireConfetti();
 
     const data = await res.json();
-    if (reason === "القداس") {
+    if (reason === "القداس" && data.log) {
       alert(`تم إضافة ${data.log.points} نقطة للقداس (حسب التكرار هذا الأسبوع)`);
     }
     setCustomPoints(prev => ({...prev, [id]: 0}));
