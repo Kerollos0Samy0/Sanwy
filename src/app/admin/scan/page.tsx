@@ -27,6 +27,8 @@ export default function Scan() {
     }
   };
 
+  const [preventDuplicateToday, setPreventDuplicateToday] = useState(true);
+
   const handleScan = async (result: any) => {
     if (!result || !result[0] || !result[0].rawValue) return;
     const id = result[0].rawValue;
@@ -52,20 +54,43 @@ export default function Scan() {
         return;
       }
 
+      let hasSuccess = false;
+      const msgs = [];
+
       for (const act of selectedActivities) {
-        await fetch('/api/points', {
+        const res = await fetch('/api/points', {
           method: 'POST',
-          body: JSON.stringify({ youthId: id, reason: act.name, points: act.defaultPoints, servantName: currentServant || "أدمن" })
+          body: JSON.stringify({ 
+            youthId: id, 
+            reason: act.name, 
+            points: act.defaultPoints, 
+            servantName: currentServant || "أدمن",
+            preventDuplicateToday
+          })
         });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          if (errData.error === 'duplicate_today') {
+            msgs.push(`⚠️ ${act.name}: مسجل من قبل`);
+          } else {
+            msgs.push(`❌ ${act.name}: خطأ`);
+          }
+        } else {
+          hasSuccess = true;
+          msgs.push(`✅ ${act.name}`);
+        }
       }
 
-      playSuccessSound();
-      fireConfetti();
+      if (hasSuccess) {
+        playSuccessSound();
+        fireConfetti();
+      }
       
       setLogs(prev => [{ 
         id: Math.random(), 
-        msg: `✅ تم تسجيل (${selectedActivities.map(a => a.name).join(' + ')}) لـ: ${youthData.name}`, 
-        type: 'success' as 'success' 
+        msg: `${youthData.name} ⬅️ ${msgs.join(' | ')}`, 
+        type: hasSuccess ? 'success' as 'success' : 'error' as 'error'
       }, ...prev].slice(0, 5));
       
     } catch (e) {
@@ -120,7 +145,18 @@ export default function Scan() {
             </div>
 
             <div className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 flex-1 min-h-[250px]">
-              <h2 className="text-xl font-black text-gray-800 mb-4 border-b pb-2">سجل المسح المباشر:</h2>
+              <div className="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 className="text-xl font-black text-gray-800">سجل المسح المباشر:</h2>
+                <label className="flex items-center gap-2 text-sm font-bold text-gray-600 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={preventDuplicateToday} 
+                    onChange={e => setPreventDuplicateToday(e.target.checked)} 
+                    className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                  />
+                  منع التكرار في نفس اليوم
+                </label>
+              </div>
               <div className="flex flex-col gap-3">
                 {logs.length === 0 ? (
                   <p className="text-gray-400 font-bold text-center mt-10">امسح كارت لتظهر النتيجة هنا...</p>

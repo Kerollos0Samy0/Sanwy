@@ -12,7 +12,22 @@ function getStartOfWeek() {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  let { youthId, reason, points, servantName } = body;
+  let { youthId, reason, points, servantName, preventDuplicateToday } = body;
+
+  if (preventDuplicateToday) {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const existingLog = await prisma.pointsLog.findFirst({
+      where: {
+        youthId,
+        reason,
+        createdAt: { gte: todayStart }
+      }
+    });
+    if (existingLog) {
+      return NextResponse.json({ error: 'duplicate_today', msg: `تم تسجيل "${reason}" من قبل اليوم!` }, { status: 400 });
+    }
+  }
 
   // قاعدة القداس: الأول بـ 50، وأي قداس إضافي في نفس الأسبوع بـ 10
   if (reason === "القداس" && points > 0) {
