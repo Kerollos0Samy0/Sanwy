@@ -168,7 +168,7 @@ export default function RecordPoints() {
                   <button onClick={() => handleAddPoints(y.id, 20, "التناول")} className="bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">التناول (+20)</button>
                   <button onClick={() => handleAddPoints(y.id, 30, "التسبحة")} className="bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">التسبحة (+30)</button>
                   <button onClick={() => handleAddPoints(y.id, 20, "العشية")} className="bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border border-orange-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">العشية (+20)</button>
-                  <button onClick={() => handleAddPoints(y.id, 50, "الخدمة")} className="bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">الخدمة (+50)</button>
+                  <button onClick={() => handleAddPoints(y.id, 30, "الخدمة")} className="bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">الخدمة (+30)</button>
                   <button onClick={() => handleAddPoints(y.id, 50, "أعمال رحمة")} className="bg-fuchsia-50 hover:bg-fuchsia-600 text-fuchsia-700 hover:text-white border border-fuchsia-200 px-2 py-3 rounded-xl font-bold text-[11px] sm:text-sm transition">أعمال رحمة (+50)</button>
                 </div>
 
