@@ -185,10 +185,7 @@ export default function Cards() {
             >
               <option value="الكل">كل المراحل</option>
               <option value="أولى ثانوي">أولى ثانوي</option>
-              <option value="أولي ثانوي">أولي ثانوي</option>
-              <option value="ثانية ثانوي">ثانية ثانوي</option>
               <option value="تانية ثانوي">تانية ثانوي</option>
-              <option value="ثالثة ثانوي">ثالثة ثانوي</option>
               <option value="تالتة ثانوي">تالتة ثانوي</option>
             </select>
           </div>

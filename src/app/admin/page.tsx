@@ -11,7 +11,7 @@ export default function Admin() {
   const fetchYouths = () => fetch('/api/youth').then(res => res.json()).then(setYouths);
   useEffect(() => { fetchYouths(); }, []);
 
-  const allGrades = Array.from(new Set(youths.map(y => y.grade).filter(Boolean)));
+  const GRADES = ["أولى ثانوي", "تانية ثانوي", "تالتة ثانوي"];
 
   const getGradeColor = (grade: string) => {
     if (!grade) return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -128,7 +128,7 @@ export default function Admin() {
                 value={selectedGrade} onChange={e => setSelectedGrade(e.target.value)}
               >
                 <option value="الكل">كل المراحل</option>
-                {allGrades.map((g: any) => (
+                {GRADES.map((g) => (
                   <option key={g} value={g}>{g}</option>
                 ))}
               </select>
