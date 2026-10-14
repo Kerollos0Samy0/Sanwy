@@ -68,3 +68,39 @@ export async function GET() {
   });
   return NextResponse.json(logs);
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const logId = searchParams.get('logId');
+
+    if (!logId) {
+      return NextResponse.json({ error: 'Missing logId' }, { status: 400 });
+    }
+
+    const log = await prisma.pointsLog.findUnique({
+      where: { id: logId }
+    });
+
+    if (!log) {
+      return NextResponse.json({ error: 'Log not found' }, { status: 404 });
+    }
+
+    await prisma.$transaction([
+      prisma.pointsLog.delete({
+        where: { id: logId }
+      }),
+      prisma.youth.update({
+        where: { id: log.youthId },
+        data: {
+          totalPoints: { decrement: log.points }
+        }
+      })
+    ]);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to delete log' }, { status: 500 });
+  }
+}
+

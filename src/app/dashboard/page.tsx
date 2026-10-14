@@ -48,6 +48,7 @@ export default function Dashboard() {
           <CategoryCard title="🌅 أبطال العشية" youthList={data.topVespers} colorClass="border-orange-500" />
           <CategoryCard title="🍞 أبطال التناول" youthList={data.topCommunion} colorClass="border-teal-500" />
           <CategoryCard title="❤️ أبطال الخدمة" youthList={data.topService} colorClass="border-red-500" />
+          <CategoryCard title="🕊️ أبطال أعمال الرحمة" youthList={data.topMercy || []} colorClass="border-fuchsia-500" />
         </div>
       </div>
     </div>

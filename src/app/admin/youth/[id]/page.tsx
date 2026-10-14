@@ -35,6 +35,20 @@ export default function YouthProfile() {
     fetchYouth();
   };
 
+  const handleDeleteLog = async (logId: string) => {
+    if (!confirm("هل أنت متأكد من حذف هذا السجل نهائياً؟ سيتم تعديل إجمالي النقاط تلقائياً.")) return;
+    try {
+      const res = await fetch(`/api/points?logId=${logId}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchYouth();
+      } else {
+        alert("فشل في حذف السجل");
+      }
+    } catch {
+      alert("حدث خطأ أثناء الاتصال");
+    }
+  };
+
   if (!youth) return <div dir="rtl" className="min-h-screen p-8 text-2xl font-bold text-center text-blue-900">جاري تحميل البروفايل... ⏳</div>;
 
   return (
@@ -176,9 +190,18 @@ export default function YouthProfile() {
                   <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex-1 shadow-sm hover:shadow-md transition">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
                       <h3 className="text-2xl font-bold text-gray-800">{log.reason}</h3>
-                      <span className="text-sm md:text-base font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-lg shrink-0" dir="ltr">
-                        {new Date(log.createdAt).toLocaleString('en-GB')}
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-sm md:text-base font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-lg" dir="ltr">
+                          {new Date(log.createdAt).toLocaleString('en-GB')}
+                        </span>
+                        <button 
+                          onClick={() => handleDeleteLog(log.id)}
+                          className="bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 px-2.5 py-1 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 shadow-xs"
+                          title="حذف هذا السجل نهائياً"
+                        >
+                          🗑️ حذف
+                        </button>
+                      </div>
                     </div>
                     <p className="text-gray-600 text-base">تم التسجيل بواسطة الخادم: <strong className="text-gray-900">{log.servantName}</strong></p>
                   </div>

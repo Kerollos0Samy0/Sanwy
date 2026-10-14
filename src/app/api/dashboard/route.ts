@@ -8,14 +8,14 @@ export async function GET() {
     include: { pointsLogs: true }
   });
 
-  // الترتيب العام
-  const overall = [...youth].sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 5);
+  // الترتيب العام (من لديهم نقاط فقط)
+  const overall = [...youth].filter(y => y.totalPoints > 0).sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 5);
 
   // دالة لحساب أعلى ناس في تصنيف معين
   const getTopByReason = (reason: string) => {
     const scores = youth.map(y => {
       const score = y.pointsLogs
-        .filter(log => log.reason === reason && log.points > 0)
+        .filter(log => log.reason === reason)
         .reduce((sum, log) => sum + log.points, 0);
       return { ...y, categoryScore: score };
     });
@@ -28,6 +28,7 @@ export async function GET() {
   const topService = getTopByReason("الخدمة");
   const topVespers = getTopByReason("العشية");
   const topCommunion = getTopByReason("التناول");
+  const topMercy = getTopByReason("أعمال رحمة");
 
   return NextResponse.json({
     overall,
@@ -35,6 +36,7 @@ export async function GET() {
     topTasbeha,
     topService,
     topVespers,
-    topCommunion
+    topCommunion,
+    topMercy
   });
 }
