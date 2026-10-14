@@ -6,10 +6,40 @@ import Link from "next/link";
 export default function Cards() {
   const [youths, setYouths] = useState<any[]>([]);
   const [isWhatsappMode, setIsWhatsappMode] = useState(false);
+  const [selectedGender, setSelectedGender] = useState<string>("الكل");
+  const [selectedGrade, setSelectedGrade] = useState<string>("الكل");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const fetchYouths = () => {
+    fetch('/api/youth')
+      .then(res => res.json())
+      .then(setYouths)
+      .catch(console.error);
+  };
 
   useEffect(() => {
-    fetch('/api/youth').then(res => res.json()).then(setYouths);
+    fetchYouths();
   }, []);
+
+  const handleRegenerate = async () => {
+    setIsRegenerating(true);
+    setMessage(null);
+    try {
+      const res = await fetch('/api/cards/generate', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        setMessage(`✅ تم إنشاء وتحديث ${data.count} كارت بنجاح في مجلد cards!`);
+      } else {
+        setMessage(`❌ فشل في التوليد: ${data.error}`);
+      }
+    } catch {
+      setMessage("❌ حدث خطأ أثناء الاتصال بالسيرفر");
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
 
   const handleWhatsappPrint = () => {
     setIsWhatsappMode(true);
@@ -19,8 +49,18 @@ export default function Cards() {
     }, 500);
   };
 
+  const filteredYouths = youths.filter(y => {
+    const matchesGender = selectedGender === "الكل" || y.gender === selectedGender;
+    const matchesGrade = selectedGrade === "الكل" || y.grade === selectedGrade;
+    const matchesSearch = !searchQuery || y.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesGender && matchesGrade && matchesSearch;
+  });
+
+  const boysCount = youths.filter(y => y.gender === "ولد").length;
+  const girlsCount = youths.filter(y => y.gender === "بنت").length;
+
   return (
-    <div dir="rtl" className="p-4 md:p-8 bg-gray-100 min-h-screen">
+    <div dir="rtl" className="p-4 md:p-8 bg-slate-100 min-h-screen text-gray-900">
       <style>{`
         @media print {
           @page { 
@@ -38,116 +78,207 @@ export default function Cards() {
         }
       `}</style>
 
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 print-hidden gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-blue-900">طباعة الكارنيهات</h1>
-        <div className="flex flex-wrap gap-3">
-          <button onClick={handleWhatsappPrint} className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded shadow flex items-center gap-2 text-sm md:text-base">
-            <span>واتساب (1 بالصفحة)</span>
-            <span>📱</span>
+      {/* Top Header & Navigation */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 print-hidden gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-blue-900 flex items-center gap-3">
+            <span>🪪</span> كارنيهات اجتماع شباب ثانوي
+          </h1>
+          <p className="text-gray-500 text-sm mt-1 font-bold">
+            إجمالي الطلاب: {youths.length} (👦 {boysCount} ولاد | 👧 {girlsCount} بنات)
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleRegenerate}
+            disabled={isRegenerating}
+            className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-xl shadow transition text-sm flex items-center gap-1.5 disabled:opacity-50"
+            title="إعادة بناء وتحديث ملفات الكارنيهات عالية الدقة"
+          >
+            <span>{isRegenerating ? "⏳ جاري التحديث..." : "🔄 تحديث صور الكارنيهات"}</span>
           </button>
-          <button onClick={() => window.print()} className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded shadow text-sm md:text-base">
-            طباعة مطبعة (8 بالصفحة) 🖨️
+
+          <button 
+            onClick={handleWhatsappPrint} 
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl shadow flex items-center gap-1.5 text-sm transition"
+          >
+            <span>📱 واتساب (1 بالصفحة)</span>
           </button>
-          <Link href="/admin" className="bg-gray-800 text-white font-bold px-4 py-2 rounded hover:bg-black shadow text-sm md:text-base">العودة &rarr;</Link>
+
+          <button 
+            onClick={() => window.print()} 
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl shadow flex items-center gap-1.5 text-sm transition"
+          >
+            <span>🖨️ طباعة مطبعة (8 بالصفحة)</span>
+          </button>
+
+          <Link href="/admin" className="bg-gray-800 text-white font-bold px-4 py-2 rounded-xl hover:bg-black shadow text-sm transition">
+            العودة &rarr;
+          </Link>
         </div>
       </div>
 
-      {/* تصميم ظهر الكارنيه الثابت */}
-      <div className={`mb-10 flex flex-col items-center md:items-start ${isWhatsappMode ? 'print-hidden' : ''}`}>
-        <h2 className="text-xl font-bold text-gray-500 mb-4 print-hidden">تصميم ظهر الكارنيه (ثابت)</h2>
-        <div className="w-[9cm] h-[6cm] bg-gradient-to-br from-blue-900 via-blue-950 to-gray-900 text-white rounded-xl overflow-hidden shadow-lg flex flex-col items-center justify-center border-2 border-gray-300 relative print:border-gray-400">
-          {/* تأثيرات دمج الخلفية */}
-          <div className="absolute top-[-2cm] right-[-2cm] w-[6cm] h-[6cm] bg-blue-500 rounded-full mix-blend-screen filter blur-[40px] opacity-30 z-0"></div>
-          <div className="absolute bottom-[-2cm] left-[-2cm] w-[6cm] h-[6cm] bg-teal-400 rounded-full mix-blend-screen filter blur-[40px] opacity-20 z-0"></div>
-          
-          <div className="bg-white p-1 rounded-full shadow-2xl z-10 mb-2">
-            <img src="/logo.png" alt="Logo" className="w-[2.2cm] h-[2.2cm] object-contain rounded-full" />
-          </div>
-          
-          <h2 className="text-[18px] font-black tracking-widest z-10 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 drop-shadow-sm">
-            كنيسة القديسة رفقة
+      {message && (
+        <div className="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 font-bold print-hidden">
+          {message}
+        </div>
+      )}
+
+      {/* Download ZIP Section */}
+      <div className="mb-6 bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 text-white p-5 rounded-2xl shadow-md print-hidden flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg md:text-xl font-black text-amber-200 flex items-center gap-2">
+            <span>📦</span> تحميل كل الكارنيهات الجاهزة (مضغوطة ZIP)
           </h2>
-          <div className="w-10 h-1 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full my-1.5 z-10"></div>
-          <h3 className="text-[12px] font-bold text-blue-200 z-10 tracking-wider">
-            اجتماع شباب ثانوي
-          </h3>
+          <p className="text-gray-300 text-xs md:text-sm mt-1">
+            تم توليد الكارنيهات بدقة عالية باسم كل طالب والـ QR Code الخاص به بدون صور.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2 shrink-0">
+          <a
+            href="/cards/all_cards.zip"
+            download="كل_الكارنيهات.zip"
+            className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-4 py-2 rounded-xl shadow text-xs md:text-sm transition flex items-center gap-1"
+          >
+            <span>⬇️ تحميل الكل ({youths.length})</span>
+          </a>
+          <a
+            href="/cards/boys_cards.zip"
+            download="كارنيهات_الولاد.zip"
+            className="bg-blue-600 hover:bg-blue-500 text-white font-black px-4 py-2 rounded-xl shadow text-xs md:text-sm transition flex items-center gap-1"
+          >
+            <span>👦 تحميل الولاد ({boysCount})</span>
+          </a>
+          <a
+            href="/cards/girls_cards.zip"
+            download="كارنيهات_البنات.zip"
+            className="bg-pink-600 hover:bg-pink-500 text-white font-black px-4 py-2 rounded-xl shadow text-xs md:text-sm transition flex items-center gap-1"
+          >
+            <span>👧 تحميل البنات ({girlsCount})</span>
+          </a>
         </div>
       </div>
 
-      <hr className={`my-8 border-2 border-dashed border-gray-300 print-hidden ${isWhatsappMode ? 'hidden' : ''}`} />
+      {/* Filters Bar */}
+      <div className="mb-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-200 print-hidden flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
+            {["الكل", "ولد", "بنت"].map(gender => (
+              <button
+                key={gender}
+                onClick={() => setSelectedGender(gender)}
+                className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-black transition ${selectedGender === gender ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-black'}`}
+              >
+                {gender === "الكل" ? "الكل" : gender === "ولد" ? "👦 ولاد" : "👧 بنات"}
+              </button>
+            ))}
+          </div>
 
-      {/* تصميم وش الكارنيه المتغير */}
-      <div>
-        <h2 className="text-xl font-bold text-gray-500 mb-4 print-hidden">تصميم وش الكارنيه (متغير)</h2>
-        <div className="flex flex-wrap gap-6 justify-center md:justify-start">
-          {youths.map(y => (
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-bold text-gray-500">المرحلة:</label>
+            <select
+              value={selectedGrade}
+              onChange={e => setSelectedGrade(e.target.value)}
+              className="border border-gray-300 rounded-xl px-3 py-1.5 text-xs md:text-sm font-bold bg-white text-gray-800 focus:outline-none focus:border-blue-500"
+            >
+              <option value="الكل">كل المراحل</option>
+              <option value="أولى ثانوي">أولى ثانوي</option>
+              <option value="أولي ثانوي">أولي ثانوي</option>
+              <option value="ثانية ثانوي">ثانية ثانوي</option>
+              <option value="تانية ثانوي">تانية ثانوي</option>
+              <option value="ثالثة ثانوي">ثالثة ثانوي</option>
+              <option value="تالتة ثانوي">تالتة ثانوي</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="w-full sm:w-64">
+          <input
+            type="text"
+            placeholder="🔍 بحث باسم الطالب..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full border border-gray-300 rounded-xl px-3 py-1.5 text-xs md:text-sm font-bold placeholder-gray-400 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      {/* Cards Grid */}
+      <div className="flex flex-wrap gap-6 justify-center md:justify-start">
+        {filteredYouths.map(y => {
+          const safeName = y.name.replace(/[\\/:*?"<>|]/g, '_').trim();
+          const safeGrade = (y.grade || 'عام').replace(/[\\/:*?"<>|]/g, '_').trim();
+          const cardImageUrl = `/cards/${encodeURIComponent(`${safeName} - ${safeGrade}.png`)}`;
+
+          return (
             <div key={y.id} className={isWhatsappMode ? 'print:break-after-page print:m-0 print:p-0' : ''}>
-              <div id={`card-${y.id}`} className="group w-[9cm] h-[6cm] bg-white rounded-xl overflow-hidden shadow-md flex flex-row relative border-2 border-gray-200 print:border-none print:shadow-none break-inside-avoid print:m-0">
-                
-                {/* تأثيرات دمج الخلفية (وش الكارنيه) */}
-                <div className="absolute top-[-2cm] right-[-2cm] w-[6cm] h-[6cm] bg-blue-100 rounded-full mix-blend-multiply filter blur-2xl opacity-80 z-0"></div>
-                <div className="absolute bottom-[-2cm] left-[-2cm] w-[6cm] h-[6cm] bg-teal-50 rounded-full mix-blend-multiply filter blur-2xl opacity-80 z-0"></div>
-                
-                {/* Watermark Logo */}
-                <img src="/logo.png" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[4cm] h-[4cm] opacity-[0.03] object-contain z-0 grayscale" />
-
-                {/* الناحية اليمين: الصورة والاسم */}
-                <div className="w-[5.5cm] h-full flex flex-col justify-center items-center relative z-10 pl-1 pr-2">
-                  
-                  {/* إطار الصورة المدمج */}
-                  <div className={`relative w-[2.6cm] h-[2.6cm] rounded-full p-1 mb-2 shadow-sm bg-gradient-to-tr ${y.gender === 'بنت' ? 'from-pink-400 to-rose-200' : 'from-blue-600 to-teal-300'}`}>
-                    <div className="w-full h-full rounded-full overflow-hidden bg-white border-2 border-white flex items-center justify-center">
-                      {y.imageUrl ? (
-                        <img src={y.imageUrl} alt="Profile" className="w-full h-full object-cover" />
-                      ) : (
-                        <img src="/logo.png" className="w-3/4 h-3/4 object-contain opacity-40" />
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* الاسم */}
-                  <h2 className="text-[15px] font-black text-gray-900 text-center leading-tight">
-                    {y.name}
-                  </h2>
-                  
-                  {/* خط زخرفي بدل المرحلة */}
-                  <div className={`w-12 h-1 rounded-full mt-1.5 mb-1 bg-gradient-to-r ${y.gender === 'بنت' ? 'from-pink-400 to-rose-300' : 'from-blue-500 to-teal-400'}`}></div>
-                  <p className="text-[10px] font-bold text-gray-500">اجتماع شباب ثانوي</p>
+              <div 
+                id={`card-${y.id}`} 
+                className="group relative w-[9cm] h-[6cm] rounded-2xl overflow-hidden shadow-md border-2 border-amber-900/20 print:border-none print:shadow-none break-inside-avoid print:m-0 bg-cover bg-center select-none"
+                style={{ backgroundImage: "url('/card-template.png')" }}
+              >
+                {/* QR Code Container */}
+                <div 
+                  className="absolute flex items-center justify-center"
+                  style={{
+                    left: '13.1%',
+                    top: '39.4%',
+                    width: '25.1%',
+                    height: '37.7%'
+                  }}
+                >
+                  <QRCodeSVG 
+                    value={y.id} 
+                    size={80}
+                    level="M"
+                    fgColor="#1a1a1a"
+                    bgColor="transparent"
+                    className="w-full h-full object-contain p-0.5"
+                  />
                 </div>
 
-                {/* الناحية الشمال: كود QR */}
-                <div className="w-[3.5cm] h-full flex items-center justify-center relative z-10 pl-2">
-                  <div className="bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col items-center">
-                    <QRCodeSVG value={y.id} size={78} />
-                  </div>
+                {/* Student Name */}
+                <div 
+                  className="absolute flex items-center justify-center text-center px-1"
+                  style={{
+                    left: '41.2%',
+                    top: '67.0%',
+                    width: '41.2%',
+                    height: '11.2%'
+                  }}
+                >
+                  <span 
+                    className="font-black text-[#420b12] leading-tight block w-full truncate"
+                    style={{
+                      fontSize: y.name.length > 25 ? '11px' : y.name.length > 20 ? '12.5px' : y.name.length > 16 ? '14px' : '15.5px'
+                    }}
+                  >
+                    {y.name}
+                  </span>
                 </div>
 
                 {/* زرار تحميل الكارنيه كصورة */}
-                <button 
-                  onClick={() => {
-                    import('html2canvas').then((html2canvas) => {
-                      const el = document.getElementById(`card-${y.id}`);
-                      if(el) {
-                        html2canvas.default(el, { scale: 3, useCORS: true }).then(canvas => {
-                          const a = document.createElement('a');
-                          a.href = canvas.toDataURL('image/png');
-                          a.download = `كارنيه_${y.name}.png`;
-                          a.click();
-                        });
-                      }
-                    });
-                  }}
-                  className="absolute top-2 right-2 z-50 bg-gray-800 text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md print-hidden hover:bg-black transition-colors opacity-0 group-hover:opacity-100"
-                  title="تحميل الكارنيه كصورة"
+                <a
+                  href={cardImageUrl}
+                  download={`كارنيه_${y.name}.png`}
+                  className="absolute top-2 right-2 z-50 bg-gray-900/80 hover:bg-black text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md print-hidden transition-all opacity-0 group-hover:opacity-100"
+                  title="تحميل الكارنيه كصورة PNG"
                 >
                   ⬇️
-                </button>
-
+                </a>
               </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
+
+      {filteredYouths.length === 0 && (
+        <div className="text-center py-12 text-gray-500 font-bold text-lg bg-white rounded-2xl shadow-sm border border-gray-200">
+          لا يوجد طلاب مطابقين للبحث أو الفلتر المحدد.
+        </div>
+      )}
     </div>
   );
 }
