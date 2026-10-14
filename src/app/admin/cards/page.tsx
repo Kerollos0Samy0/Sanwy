@@ -60,7 +60,7 @@ export default function Cards() {
   const girlsCount = youths.filter(y => y.gender === "بنت").length;
 
   return (
-    <div dir="rtl" className="p-4 md:p-8 bg-slate-100 min-h-screen text-gray-900">
+    <div dir="rtl" className="p-3 sm:p-6 md:p-8 bg-slate-100 min-h-screen text-gray-900">
       <style>{`
         @media print {
           @page { 
@@ -216,7 +216,7 @@ export default function Cards() {
             <div key={y.id} className={isWhatsappMode ? 'print:break-after-page print:m-0 print:p-0' : ''}>
               <div 
                 id={`card-${y.id}`} 
-                className="group relative w-[9cm] h-[6cm] rounded-2xl overflow-hidden shadow-md border-2 border-amber-900/20 print:border-none print:shadow-none break-inside-avoid print:m-0 bg-cover bg-center select-none"
+                className="group relative w-[9cm] max-w-[calc(100vw-2rem)] h-[6cm] max-h-[calc((100vw-2rem)*2/3)] rounded-2xl overflow-hidden shadow-md border-2 border-amber-900/20 print:w-[9cm] print:h-[6cm] print:border-none print:shadow-none break-inside-avoid print:m-0 bg-cover bg-center select-none mx-auto"
                 style={{ backgroundImage: "url('/card-template.png')" }}
               >
                 {/* QR Code Container */}

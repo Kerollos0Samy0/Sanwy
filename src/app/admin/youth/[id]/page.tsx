@@ -49,67 +49,77 @@ export default function YouthProfile() {
     }
   };
 
-  if (!youth) return <div dir="rtl" className="min-h-screen p-8 text-2xl font-bold text-center text-blue-900">جاري تحميل البروفايل... ⏳</div>;
+  if (!youth) return (
+    <div dir="rtl" className="min-h-screen p-8 text-xl font-bold text-center text-blue-900 flex items-center justify-center">
+      جاري تحميل البروفايل... ⏳
+    </div>
+  );
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50 p-4 md:p-8">
+    <div dir="rtl" className="min-h-screen bg-slate-100 p-3 sm:p-6 md:p-8 text-gray-900">
       <div className="max-w-4xl mx-auto">
-        <Link href="/admin" className="text-blue-600 font-bold hover:underline mb-6 inline-block text-lg">&larr; العودة للوحة الخدام</Link>
+        <Link href="/admin" className="text-blue-700 font-bold hover:underline mb-4 inline-flex items-center gap-1 text-sm sm:text-base">
+          <span>&larr;</span> العودة للوحة الخدام
+        </Link>
         
         {/* Profile Card */}
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-10 border border-gray-100">
-          <div className={`h-32 relative ${youth.gender === 'بنت' ? 'bg-gradient-to-r from-pink-600 to-pink-400' : 'bg-gradient-to-r from-blue-900 to-blue-600'}`}></div>
-          <div className="px-6 md:px-10 pb-8 relative">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end -mt-16 mb-6 gap-4">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm overflow-hidden mb-6 sm:mb-8 border border-gray-200">
+          <div className={`h-24 sm:h-32 relative ${youth.gender === 'بنت' ? 'bg-gradient-to-r from-pink-600 to-rose-400' : 'bg-gradient-to-r from-blue-900 to-blue-600'}`}></div>
+          <div className="px-4 sm:px-8 pb-6 sm:pb-8 relative">
+            <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end -mt-12 sm:-mt-16 mb-5 gap-3">
               {youth.imageUrl ? (
                 <img 
                   src={youth.imageUrl} 
                   alt="Profile" 
-                  className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl bg-white object-cover"
+                  className="w-24 h-24 sm:w-36 sm:h-36 rounded-full border-4 border-white shadow-md bg-white object-cover"
                 />
               ) : (
-                <div className={`w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl flex items-center justify-center ${youth.gender === 'بنت' ? 'bg-pink-50' : 'bg-blue-50'}`}>
-                  <svg className={`w-16 h-16 md:w-20 md:h-20 ${youth.gender === 'بنت' ? 'text-pink-300' : 'text-blue-300'}`} fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
+                <div className={`w-24 h-24 sm:w-36 sm:h-36 rounded-full border-4 border-white shadow-md flex items-center justify-center ${youth.gender === 'بنت' ? 'bg-pink-50' : 'bg-blue-50'}`}>
+                  <span className="text-4xl sm:text-6xl">{youth.gender === 'بنت' ? '👧' : '👦'}</span>
                 </div>
               )}
-              <button onClick={() => setIsEditing(!isEditing)} className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold px-6 py-3 rounded-xl shadow-sm transition">
+              <button 
+                onClick={() => setIsEditing(!isEditing)} 
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-black px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl shadow-xs transition text-xs sm:text-sm active:scale-95"
+              >
                 {isEditing ? "إلغاء التعديل ❌" : "تعديل البيانات ✏️"}
               </button>
             </div>
 
             {isEditing ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-gray-50 p-4 sm:p-6 rounded-2xl border border-gray-200">
                 <div>
-                  <label className="block text-gray-700 font-bold mb-2">الاسم</label>
-                  <input className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
+                  <label className="block text-gray-700 font-bold mb-1 text-xs sm:text-sm">الاسم</label>
+                  <input className="w-full border border-gray-300 p-2.5 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 text-sm bg-white" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-bold mb-2">المرحلة</label>
-                  <select className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white" value={editForm.grade} onChange={e => setEditForm({...editForm, grade: e.target.value})}>
+                  <label className="block text-gray-700 font-bold mb-1 text-xs sm:text-sm">المرحلة</label>
+                  <select className="w-full border border-gray-300 p-2.5 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white text-sm" value={editForm.grade} onChange={e => setEditForm({...editForm, grade: e.target.value})}>
                     <option value="أولى ثانوي">أولى ثانوي</option>
+                    <option value="أولي ثانوي">أولي ثانوي</option>
+                    <option value="ثانية ثانوي">ثانية ثانوي</option>
                     <option value="تانية ثانوي">تانية ثانوي</option>
+                    <option value="ثالثة ثانوي">ثالثة ثانوي</option>
                     <option value="تالتة ثانوي">تالتة ثانوي</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-bold mb-2">النوع</label>
-                  <select className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white" value={editForm.gender} onChange={e => setEditForm({...editForm, gender: e.target.value})}>
+                  <label className="block text-gray-700 font-bold mb-1 text-xs sm:text-sm">النوع</label>
+                  <select className="w-full border border-gray-300 p-2.5 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white text-sm" value={editForm.gender} onChange={e => setEditForm({...editForm, gender: e.target.value})}>
                     <option value="ولد">ولد</option>
                     <option value="بنت">بنت</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-700 font-bold mb-2">تاريخ الميلاد</label>
-                  <input type="date" className="w-full border-2 border-gray-300 p-3 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900" value={editForm.dateOfBirth} onChange={e => setEditForm({...editForm, dateOfBirth: e.target.value})} />
+                  <label className="block text-gray-700 font-bold mb-1 text-xs sm:text-sm">تاريخ الميلاد</label>
+                  <input type="date" className="w-full border border-gray-300 p-2.5 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white text-sm" value={editForm.dateOfBirth} onChange={e => setEditForm({...editForm, dateOfBirth: e.target.value})} />
                 </div>
-                <div>
-                  <label className="block text-gray-700 font-bold mb-2">رفع صورة شخصية</label>
+                <div className="sm:col-span-2">
+                  <label className="block text-gray-700 font-bold mb-1 text-xs sm:text-sm">رفع صورة شخصية</label>
                   <input 
                     type="file" 
                     accept="image/*"
-                    className="w-full border-2 border-gray-300 p-2 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white" 
+                    className="w-full border border-gray-300 p-2 rounded-xl focus:border-blue-500 focus:outline-none font-bold text-gray-900 bg-white text-xs sm:text-sm"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
@@ -118,11 +128,10 @@ export default function YouthProfile() {
                         const img = new Image();
                         img.onload = () => {
                           const canvas = document.createElement('canvas');
-                          const MAX_WIDTH = 300;
-                          const MAX_HEIGHT = 300;
+                          const MAX_WIDTH = 400;
+                          const MAX_HEIGHT = 400;
                           let width = img.width;
                           let height = img.height;
-                          
                           if (width > height) {
                             if (width > MAX_WIDTH) {
                               height *= MAX_WIDTH / width;
@@ -146,26 +155,27 @@ export default function YouthProfile() {
                       reader.readAsDataURL(file);
                     }} 
                   />
-                  <p className="text-xs text-gray-500 mt-1">سيتم تصغير الصورة تلقائياً لتوفير المساحة</p>
                 </div>
-                <div className="md:col-span-2 text-left mt-2 flex items-center justify-end gap-4">
+                <div className="sm:col-span-2 text-left mt-2 flex items-center justify-end gap-3">
                   {editForm.imageUrl && editForm.imageUrl.startsWith('data:image') && (
-                    <span className="text-green-600 font-bold text-sm">تم تجهيز الصورة بنجاح ✅</span>
+                    <span className="text-green-600 font-bold text-xs">تم تجهيز الصورة بنجاح ✅</span>
                   )}
-                  <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white font-bold px-10 py-3 rounded-xl shadow-md transition text-lg">حفظ التغييرات ✅</button>
+                  <button onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-6 py-2.5 rounded-xl shadow-xs transition text-sm">
+                    حفظ التغييرات ✅
+                  </button>
                 </div>
               </div>
             ) : (
               <div>
-                <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">{youth.name}</h1>
-                <div className="flex flex-wrap gap-4 text-gray-700 font-bold text-lg mb-4">
-                  <span className="bg-gray-100 px-4 py-2 rounded-xl flex items-center gap-2">🎓 {youth.grade}</span>
-                  <span className="bg-gray-100 px-4 py-2 rounded-xl flex items-center gap-2">🎂 {
+                <h1 className="text-2xl sm:text-4xl font-black text-gray-900 mb-2 sm:mb-3 text-center sm:text-right">{youth.name}</h1>
+                <div className="flex flex-wrap gap-2 justify-center sm:justify-start text-xs sm:text-base font-bold text-gray-700">
+                  <span className="bg-gray-100 px-3 py-1.5 rounded-xl">🎓 {youth.grade}</span>
+                  <span className="bg-gray-100 px-3 py-1.5 rounded-xl">🎂 {
                     youth.dateOfBirth 
                       ? (youth.dateOfBirth.includes('/') ? youth.dateOfBirth : new Date(youth.dateOfBirth).toLocaleDateString('ar-EG')) 
                       : 'تاريخ الميلاد غير مسجل'
                   }</span>
-                  <span className="bg-blue-100 text-blue-900 px-4 py-2 rounded-xl flex items-center gap-2">⭐ {youth.totalPoints} نقطة</span>
+                  <span className="bg-blue-100 text-blue-900 px-3 py-1.5 rounded-xl font-black">⭐ {youth.totalPoints} نقطة</span>
                 </div>
               </div>
             )}
@@ -173,41 +183,50 @@ export default function YouthProfile() {
         </div>
 
         {/* Timeline */}
-        <h2 className="text-3xl font-black text-blue-900 mb-8 flex items-center gap-3">📍 خط السير والسجل </h2>
-        <div className="bg-white rounded-3xl shadow-lg p-6 md:p-10 border border-gray-100 relative">
-          {/* Vertical Line */}
-          <div className="absolute right-[43px] md:right-[58px] top-12 bottom-12 w-1 bg-blue-100"></div>
-          
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl sm:text-2xl font-black text-blue-900 flex items-center gap-2">
+            <span>📍</span> خط السير وسجل النقاط
+          </h2>
+          <span className="text-xs sm:text-sm font-bold text-gray-500">
+            {youth.pointsLogs.length} حركة
+          </span>
+        </div>
+
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm p-3.5 sm:p-6 border border-gray-200">
           {youth.pointsLogs.length === 0 ? (
-            <p className="text-gray-500 font-bold text-center text-xl py-10 relative z-10">لا يوجد أي نشاط مسجل في خط السير حتى الآن.</p>
+            <p className="text-gray-400 font-bold text-center text-base py-10">لا يوجد أي نشاط مسجل في خط السير حتى الآن.</p>
           ) : (
-            <ul className="space-y-8 relative z-10">
-              {youth.pointsLogs.map((log: any, idx: number) => (
-                <li key={log.id} className="flex items-center gap-6">
-                  <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full text-white flex items-center justify-center font-black text-xl md:text-2xl shadow-lg border-4 border-white shrink-0 z-10 ${log.points > 0 ? 'bg-blue-500' : 'bg-red-500'}`}>
+            <div className="space-y-3 sm:space-y-4">
+              {youth.pointsLogs.map((log: any) => (
+                <div key={log.id} className="flex items-start gap-2.5 sm:gap-4 p-3 sm:p-4 rounded-xl border border-gray-100 bg-gray-50/70 hover:bg-gray-50 transition">
+                  {/* Points Badge */}
+                  <div className={`w-11 h-11 sm:w-13 sm:h-13 rounded-xl text-white flex items-center justify-center font-black text-sm sm:text-base shrink-0 shadow-xs ${log.points > 0 ? 'bg-blue-600' : 'bg-red-500'}`}>
                     {log.points > 0 ? '+' : ''}{log.points}
                   </div>
-                  <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 flex-1 shadow-sm hover:shadow-md transition">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
-                      <h3 className="text-2xl font-bold text-gray-800">{log.reason}</h3>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-sm md:text-base font-bold text-gray-500 bg-gray-200 px-3 py-1 rounded-lg" dir="ltr">
-                          {new Date(log.createdAt).toLocaleString('en-GB')}
-                        </span>
-                        <button 
-                          onClick={() => handleDeleteLog(log.id)}
-                          className="bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 px-2.5 py-1 rounded-lg text-xs md:text-sm font-bold transition flex items-center gap-1 shadow-xs"
-                          title="حذف هذا السجل نهائياً"
-                        >
-                          🗑️ حذف
-                        </button>
-                      </div>
+
+                  {/* Log Details */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="text-base sm:text-lg font-black text-gray-900 truncate">{log.reason}</h3>
+                      <button 
+                        onClick={() => handleDeleteLog(log.id)}
+                        className="bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 px-2 py-0.5 rounded-lg text-xs font-bold transition shrink-0 active:scale-95"
+                        title="حذف هذا السجل نهائياً"
+                      >
+                        🗑️ حذف
+                      </button>
                     </div>
-                    <p className="text-gray-600 text-base">تم التسجيل بواسطة الخادم: <strong className="text-gray-900">{log.servantName}</strong></p>
+
+                    <div className="flex flex-wrap items-center justify-between gap-1 mt-1 text-xs text-gray-500 font-bold">
+                      <span>الخادم: <strong className="text-gray-800">{log.servantName || 'أدمن'}</strong></span>
+                      <span dir="ltr" className="bg-gray-200/80 px-2 py-0.5 rounded text-[11px] font-mono">
+                        {new Date(log.createdAt).toLocaleString('en-GB')}
+                      </span>
+                    </div>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
         

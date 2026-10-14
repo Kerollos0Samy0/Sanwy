@@ -1,21 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { fireConfetti, playSuccessSound } from "@/lib/effects";
 
 export default function Admin() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGrade, setSelectedGrade] = useState("الكل");
-  const [currentServant, setCurrentServant] = useState("أدمن");
+  const [selectedGender, setSelectedGender] = useState("الكل");
   const [youths, setYouths] = useState<any[]>([]);
-  const [customPoints, setCustomPoints] = useState<{ [key: string]: number }>({});
-  const [customReason, setCustomReason] = useState<{ [key: string]: string }>({});
-
-  const filteredYouths = youths.filter(y => {
-    const matchesGrade = selectedGrade === "الكل" || y.grade === selectedGrade;
-    const matchesSearch = y.name.includes(searchQuery);
-    return matchesGrade && matchesSearch;
-  });
 
   const fetchYouths = () => fetch('/api/youth').then(res => res.json()).then(setYouths);
   useEffect(() => { fetchYouths(); }, []);
@@ -36,7 +27,13 @@ export default function Admin() {
     'تالتة ثانوي': 3, 'ثالثة ثانوي': 3,
   };
 
-  // Sort by grade, then by name
+  const filteredYouths = youths.filter(y => {
+    const matchesGrade = selectedGrade === "الكل" || y.grade === selectedGrade;
+    const matchesGender = selectedGender === "الكل" || y.gender === selectedGender;
+    const matchesSearch = !searchQuery || y.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesGrade && matchesGender && matchesSearch;
+  });
+
   filteredYouths.sort((a, b) => {
     const orderA = gradeOrder[a.grade] || 99;
     const orderB = gradeOrder[b.grade] || 99;
@@ -44,106 +41,151 @@ export default function Admin() {
     return (a.name || "").localeCompare(b.name || "");
   });
 
+  const boysCount = youths.filter(y => y.gender === "ولد").length;
+  const girlsCount = youths.filter(y => y.gender === "بنت").length;
+
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-100 p-4 md:p-8">
+    <div dir="rtl" className="min-h-screen bg-slate-100 p-3 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6 border-b-2 border-gray-200 pb-4 gap-4 flex-wrap">
-          <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="Logo" className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-white shadow-md object-cover" />
-            <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900">لوحة تحكم الخدام</h1>
+        
+        {/* Header */}
+        <div className="flex justify-between items-center mb-5 bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200 gap-3">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Logo" className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-white shadow-sm object-cover shrink-0" />
+            <div>
+              <h1 className="text-xl sm:text-3xl font-black text-blue-900 leading-tight">لوحة الخدام</h1>
+              <p className="text-xs sm:text-sm font-bold text-gray-500 mt-0.5">
+                {youths.length} مخدوم (👦 {boysCount} | 👧 {girlsCount})
+              </p>
+            </div>
           </div>
-          <Link href="/admin/add-youth" className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition whitespace-nowrap ml-auto md:ml-0">
-            + إضافة مخدوم
+          <Link href="/admin/add-youth" className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-3.5 sm:px-5 py-2.5 rounded-xl shadow-sm transition text-xs sm:text-base whitespace-nowrap active:scale-95">
+            + مخدوم جديد
           </Link>
         </div>
         
-        {/* Top Action Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
-          <Link href="/admin/record-points" className="flex-1 min-w-[140px] bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-3xl mb-2">✍️</span>
-            تسجيل النقاط
+        {/* Quick Actions Mobile Grid (2 cols on mobile, 3 on tablet, 6 on desktop) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-4 mb-6">
+          <Link href="/admin/record-points" className="bg-amber-500 hover:bg-amber-600 text-white font-black p-3.5 sm:p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center transition active:scale-95">
+            <span className="text-2xl sm:text-3xl mb-1.5">✍️</span>
+            <span className="text-sm sm:text-base">تسجيل النقاط</span>
           </Link>
-          <Link href="/admin/scan" className="flex-1 min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-3xl mb-2">📷</span>
-            الكاميرا (QR)
+
+          <Link href="/admin/scan" className="bg-blue-600 hover:bg-blue-700 text-white font-black p-3.5 sm:p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center transition active:scale-95">
+            <span className="text-2xl sm:text-3xl mb-1.5">📷</span>
+            <span className="text-sm sm:text-base">المسح (QR)</span>
           </Link>
-          <Link href="/admin/cards" className="flex-1 min-w-[140px] bg-purple-600 hover:bg-purple-700 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-3xl mb-2">🖨️</span>
-            طباعة الكارنيهات
+
+          <Link href="/admin/cards" className="bg-purple-600 hover:bg-purple-700 text-white font-black p-3.5 sm:p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center transition active:scale-95">
+            <span className="text-2xl sm:text-3xl mb-1.5">🪪</span>
+            <span className="text-sm sm:text-base">الكارنيهات</span>
           </Link>
-          <Link href="/dashboard" className="flex-1 min-w-[140px] bg-green-600 hover:bg-green-700 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-3xl mb-2">📊</span>
-            لوحة الأبطال
+
+          <Link href="/dashboard" className="bg-teal-600 hover:bg-teal-700 text-white font-black p-3.5 sm:p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center transition active:scale-95">
+            <span className="text-2xl sm:text-3xl mb-1.5">📊</span>
+            <span className="text-sm sm:text-base">لوحة الأبطال</span>
           </Link>
-          <Link href="/admin/efteqad" className="flex-1 min-w-[140px] bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-3xl mb-2">🔍</span>
-            الافتقاد
+
+          <Link href="/admin/efteqad" className="bg-rose-600 hover:bg-rose-700 text-white font-black p-3.5 sm:p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center transition active:scale-95">
+            <span className="text-2xl sm:text-3xl mb-1.5">🔍</span>
+            <span className="text-sm sm:text-base">الافتقاد</span>
           </Link>
-          <Link href="/admin/logs" className="flex-1 min-w-[140px] bg-gray-800 hover:bg-black text-white font-bold px-2 py-6 rounded-2xl shadow-md text-lg text-center flex flex-col items-center justify-center transition transform hover:-translate-y-1">
-            <span className="text-3xl mb-2">📜</span>
-            سجل النقاط
+
+          <Link href="/admin/logs" className="bg-gray-800 hover:bg-black text-white font-black p-3.5 sm:p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center transition active:scale-95">
+            <span className="text-2xl sm:text-3xl mb-1.5">📜</span>
+            <span className="text-sm sm:text-base">سجل النقاط</span>
           </Link>
         </div>
         
-        {/* Search Bar */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm mb-8 border border-gray-200">
+        {/* Search & Filters */}
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl shadow-sm mb-6 border border-gray-200 flex flex-col gap-3">
           <input 
             type="text"
-            className="w-full border-2 border-gray-300 p-4 rounded-xl text-lg font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+            className="w-full border-2 border-gray-200 p-3 sm:p-3.5 rounded-xl text-base sm:text-lg font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500" 
             value={searchQuery} onChange={e => setSearchQuery(e.target.value)} 
-            placeholder="🔍 ابحث عن مخدوم بالاسم..." 
+            placeholder="🔍 ابحث بالاسم..." 
           />
-        </div>
 
-        {/* Youth List */}
-        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6 border-b pb-4 gap-4">
-            <h2 className="text-2xl font-bold text-gray-800">قائمة المخدومين (الدليل)</h2>
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <label className="font-bold text-gray-700 whitespace-nowrap">تصفية بالمرحلة:</label>
+          <div className="flex flex-wrap items-center justify-between gap-2.5">
+            {/* Gender filter */}
+            <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
+              {["الكل", "ولد", "بنت"].map(g => (
+                <button
+                  key={g}
+                  onClick={() => setSelectedGender(g)}
+                  className={`px-3 py-1 rounded-lg text-xs sm:text-sm font-black transition ${selectedGender === g ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600'}`}
+                >
+                  {g === "الكل" ? "الكل" : g === "ولد" ? "👦 ولاد" : "👧 بنات"}
+                </button>
+              ))}
+            </div>
+
+            {/* Grade filter */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <label className="text-xs sm:text-sm font-bold text-gray-600 whitespace-nowrap">المرحلة:</label>
               <select 
-                className="flex-1 md:w-48 border-2 border-gray-300 p-2 rounded-xl font-bold text-gray-900 focus:outline-none focus:border-blue-500"
+                className="flex-1 sm:w-44 border border-gray-300 p-1.5 sm:p-2 rounded-xl text-xs sm:text-sm font-bold text-gray-900 focus:outline-none focus:border-blue-500 bg-white"
                 value={selectedGrade} onChange={e => setSelectedGrade(e.target.value)}
               >
-                <option value="الكل">الكل</option>
+                <option value="الكل">كل المراحل</option>
                 {allGrades.map((g: any) => (
                   <option key={g} value={g}>{g}</option>
                 ))}
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+
+        {/* Youth Grid */}
+        <div className="bg-white p-3.5 sm:p-6 rounded-2xl shadow-sm border border-gray-200">
+          <div className="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+            <h2 className="text-lg sm:text-2xl font-black text-gray-800">دليل المخدومين</h2>
+            <span className="text-xs sm:text-sm font-bold text-gray-500">
+              عرض {filteredYouths.length} من {youths.length}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {filteredYouths.length === 0 ? (
-              <div className="col-span-full text-center text-gray-500 font-bold py-8">لا يوجد مخدومين في هذه المرحلة</div>
+              <div className="col-span-full text-center text-gray-400 font-bold py-10 text-base">لا يوجد مخدومين مطابقين للبحث</div>
             ) : (
               filteredYouths.map(y => (
-              <Link href={`/admin/youth/${y.id}`} key={y.id} className={`flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-200 border-r-4 ${y.gender === 'بنت' ? 'border-r-pink-400 hover:border-pink-300' : 'border-r-blue-400 hover:border-blue-300'}`}>
-                {y.imageUrl ? (
-                  <img 
-                    src={y.imageUrl} 
-                    alt="Avatar" 
-                    className="w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 object-cover"
-                  />
-                ) : (
-                  <div className={`w-16 h-16 rounded-full shadow-sm border-2 border-gray-100 flex items-center justify-center shrink-0 ${y.gender === 'بنت' ? 'bg-pink-50' : 'bg-blue-50'}`}>
-                    <svg className={`w-8 h-8 ${y.gender === 'بنت' ? 'text-pink-300' : 'text-blue-300'}`} fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
+                <Link 
+                  href={`/admin/youth/${y.id}`} 
+                  key={y.id} 
+                  className={`flex items-center gap-3.5 p-3.5 sm:p-4 bg-white border border-gray-200 rounded-2xl shadow-xs hover:shadow-md transition-all active:scale-[0.98] border-r-4 ${y.gender === 'بنت' ? 'border-r-pink-400' : 'border-r-blue-500'}`}
+                >
+                  {y.imageUrl ? (
+                    <img 
+                      src={y.imageUrl} 
+                      alt="Avatar" 
+                      className="w-13 h-13 sm:w-16 sm:h-16 rounded-full shadow-xs border border-gray-100 object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className={`w-13 h-13 sm:w-16 sm:h-16 rounded-full shadow-xs border border-gray-100 flex items-center justify-center shrink-0 ${y.gender === 'بنت' ? 'bg-pink-50 text-pink-400' : 'bg-blue-50 text-blue-500'}`}>
+                      <span className="text-2xl sm:text-3xl">
+                        {y.gender === 'بنت' ? '👧' : '👦'}
+                      </span>
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base sm:text-lg font-black text-gray-900 truncate">{y.name}</h3>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md border ${getGradeColor(y.grade)}`}>
+                        {y.grade || 'غير محدد'}
+                      </span>
+                      <span className="text-xs font-bold text-gray-500">
+                        <strong className="text-blue-700 text-sm sm:text-base mx-0.5">{y.totalPoints}</strong> نقطة
+                      </span>
+                    </div>
                   </div>
-                )}
-                <div>
-                  <h3 className="text-xl font-black text-gray-900 block leading-tight">{y.name}</h3>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className={`text-xs font-bold px-2 py-1 rounded-md border ${getGradeColor(y.grade)}`}>{y.grade || 'غير محدد'}</span>
-                    <span className="text-sm font-bold text-gray-500">
-                      <strong className="text-blue-700 text-lg mx-1">{y.totalPoints}</strong> نقطة
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            )))}
+                  <span className="text-gray-400 text-sm font-bold">&larr;</span>
+                </Link>
+              ))
+            )}
           </div>
         </div>
+
       </div>
     </div>
   );
