@@ -82,7 +82,7 @@ export default function Cards() {
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 print-hidden gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-blue-900 flex items-center gap-3">
-            <span>🪪</span> كارنيهات اجتماع شباب ثانوي
+            <span>💳</span> كارنيهات اجتماع شباب ثانوي
           </h1>
           <p className="text-gray-500 text-sm mt-1 font-bold">
             إجمالي الطلاب: {youths.length} (👦 {boysCount} ولاد | 👧 {girlsCount} بنات)

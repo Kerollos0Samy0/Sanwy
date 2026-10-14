@@ -77,7 +77,7 @@ export default function Admin() {
           </Link>
 
           <Link href="/admin/cards" className="bg-purple-600 hover:bg-purple-700 text-white font-black p-3.5 sm:p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center transition active:scale-95">
-            <span className="text-2xl sm:text-3xl mb-1.5">🪪</span>
+            <span className="text-2xl sm:text-3xl mb-1.5">💳</span>
             <span className="text-sm sm:text-base">الكارنيهات</span>
           </Link>
 
