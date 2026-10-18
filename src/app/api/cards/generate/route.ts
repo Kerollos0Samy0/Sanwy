@@ -47,13 +47,13 @@ export async function POST() {
       });
 
       const name = youth.name.trim();
-      let fontSize = 34;
+      let fontSize = 30;
       if (name.length > 25) {
-        fontSize = 23;
+        fontSize = 20;
       } else if (name.length > 20) {
+        fontSize = 23;
+      } else if (name.length > 15) {
         fontSize = 26;
-      } else if (name.length > 16) {
-        fontSize = 29;
       }
 
       const nameSvg = `
@@ -66,7 +66,7 @@ export async function POST() {
               fill: #420b12;
             }
           </style>
-          <text x="215" y="46" class="name" text-anchor="middle">${name}</text>
+          <text x="215" y="42" class="name" text-anchor="middle">${name}</text>
         </svg>
       `;
 

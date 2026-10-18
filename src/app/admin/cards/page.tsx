@@ -3,7 +3,75 @@ import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 
+const t = {
+  ar: {
+    title: "كارنيهات اجتماع شباب ثانوي",
+    subtitle: (total: number, boys: number, girls: number) => `إجمالي الطلاب: ${total} (👦 ${boys} ولاد | 👧 ${girls} بنات)`,
+    regenerating: "⏳ جاري التحديث...",
+    regenerate: "🔄 تحديث صور الكارنيهات",
+    regenerateTitle: "إعادة بناء وتحديث ملفات الكارنيهات عالية الدقة",
+    whatsappPrint: "📱 واتساب (1 بالصفحة)",
+    batchPrint: "🖨️ طباعة مطبعة (8 بالصفحة)",
+    back: "العودة",
+    langButton: "English 🌐",
+    zipTitle: "تحميل كل الكارنيهات الجاهزة (مضغوطة ZIP)",
+    zipSubtitle: "تم توليد الكارنيهات بدقة عالية باسم كل طالب والـ QR Code الخاص به بدون صور.",
+    downloadAll: (count: number) => `⬇️ تحميل الكل (${count})`,
+    downloadBoys: (count: number) => `👦 تحميل الولاد (${count})`,
+    downloadGirls: (count: number) => `👧 تحميل البنات (${count})`,
+    all: "الكل",
+    boys: "👦 ولاد",
+    girls: "👧 بنات",
+    gradeLabel: "المرحلة:",
+    allGrades: "كل المراحل",
+    grades: {
+      "أولى ثانوي": "أولى ثانوي",
+      "تانية ثانوي": "تانية ثانوي",
+      "تالتة ثانوي": "تالتة ثانوي",
+    } as Record<string, string>,
+    searchPlaceholder: "🔍 بحث باسم الطالب...",
+    downloadCardTitle: "تحميل الكارنيه كصورة PNG",
+    noMatch: "لا يوجد طلاب مطابقين للبحث أو الفلتر المحدد.",
+    successMsg: (count: number) => `✅ تم إنشاء وتحديث ${count} كارت بنجاح في مجلد cards!`,
+    failMsg: (err: string) => `❌ فشل في التوليد: ${err}`,
+    networkError: "❌ حدث خطأ أثناء الاتصال بالسيرفر",
+  },
+  en: {
+    title: "Youth ID Cards",
+    subtitle: (total: number, boys: number, girls: number) => `Total Students: ${total} (👦 ${boys} Boys | 👧 ${girls} Girls)`,
+    regenerating: "⏳ Updating...",
+    regenerate: "🔄 Regenerate Cards",
+    regenerateTitle: "Rebuild and update high-resolution card files",
+    whatsappPrint: "📱 WhatsApp (1/page)",
+    batchPrint: "🖨️ Batch Print (8/page)",
+    back: "Back",
+    langButton: "عربي 🌐",
+    zipTitle: "Download All Ready Cards (ZIP)",
+    zipSubtitle: "High-resolution cards generated with each student's name and QR code without photos.",
+    downloadAll: (count: number) => `⬇️ Download All (${count})`,
+    downloadBoys: (count: number) => `👦 Download Boys (${count})`,
+    downloadGirls: (count: number) => `👧 Download Girls (${count})`,
+    all: "All",
+    boys: "👦 Boys",
+    girls: "👧 Girls",
+    gradeLabel: "Grade:",
+    allGrades: "All Grades",
+    grades: {
+      "أولى ثانوي": "1st Secondary",
+      "تانية ثانوي": "2nd Secondary",
+      "تالتة ثانوي": "3rd Secondary",
+    } as Record<string, string>,
+    searchPlaceholder: "🔍 Search student name...",
+    downloadCardTitle: "Download card as PNG image",
+    noMatch: "No students match the selected search or filter.",
+    successMsg: (count: number) => `✅ Successfully generated ${count} cards in cards folder!`,
+    failMsg: (err: string) => `❌ Generation failed: ${err}`,
+    networkError: "❌ Network error occurred while connecting to server",
+  }
+};
+
 export default function Cards() {
+  const [lang, setLang] = useState<'ar' | 'en'>('ar');
   const [youths, setYouths] = useState<any[]>([]);
   const [isWhatsappMode, setIsWhatsappMode] = useState(false);
   const [selectedGender, setSelectedGender] = useState<string>("الكل");
@@ -11,6 +79,21 @@ export default function Cards() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('admin_lang');
+    if (saved === 'en' || saved === 'ar') {
+      setLang(saved);
+    }
+  }, []);
+
+  const toggleLang = () => {
+    const next = lang === 'ar' ? 'en' : 'ar';
+    setLang(next);
+    localStorage.setItem('admin_lang', next);
+  };
+
+  const curT = t[lang];
 
   const fetchYouths = () => {
     fetch('/api/youth')
@@ -30,12 +113,12 @@ export default function Cards() {
       const res = await fetch('/api/cards/generate', { method: 'POST' });
       const data = await res.json();
       if (res.ok) {
-        setMessage(`✅ تم إنشاء وتحديث ${data.count} كارت بنجاح في مجلد cards!`);
+        setMessage(curT.successMsg(data.count));
       } else {
-        setMessage(`❌ فشل في التوليد: ${data.error}`);
+        setMessage(curT.failMsg(data.error));
       }
     } catch {
-      setMessage("❌ حدث خطأ أثناء الاتصال بالسيرفر");
+      setMessage(curT.networkError);
     } finally {
       setIsRegenerating(false);
     }
@@ -60,7 +143,7 @@ export default function Cards() {
   const girlsCount = youths.filter(y => y.gender === "بنت").length;
 
   return (
-    <div dir="rtl" className="p-3 sm:p-6 md:p-8 bg-slate-100 min-h-screen text-gray-900">
+    <div dir={lang === 'en' ? 'ltr' : 'rtl'} className="p-3 sm:p-6 md:p-8 bg-slate-100 min-h-screen text-gray-900">
       <style>{`
         @media print {
           @page { 
@@ -82,39 +165,48 @@ export default function Cards() {
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 print-hidden gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-blue-900 flex items-center gap-3">
-            <span>💳</span> كارنيهات اجتماع شباب ثانوي
+            <span>💳</span> {curT.title}
           </h1>
           <p className="text-gray-500 text-sm mt-1 font-bold">
-            إجمالي الطلاب: {youths.length} (👦 {boysCount} ولاد | 👧 {girlsCount} بنات)
+            {curT.subtitle(youths.length, boysCount, girlsCount)}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* Language Switch */}
+          <button
+            onClick={toggleLang}
+            className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-black px-3.5 py-2 rounded-xl border border-slate-300 shadow-xs transition text-xs sm:text-sm flex items-center gap-1 active:scale-95"
+            title={lang === 'ar' ? 'Switch interface to English' : 'تحويل الواجهة للغة العربية'}
+          >
+            <span>{curT.langButton}</span>
+          </button>
+
           <button
             onClick={handleRegenerate}
             disabled={isRegenerating}
-            className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-xl shadow transition text-sm flex items-center gap-1.5 disabled:opacity-50"
-            title="إعادة بناء وتحديث ملفات الكارنيهات عالية الدقة"
+            className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-xl shadow transition text-sm flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
+            title={curT.regenerateTitle}
           >
-            <span>{isRegenerating ? "⏳ جاري التحديث..." : "🔄 تحديث صور الكارنيهات"}</span>
+            <span>{isRegenerating ? curT.regenerating : curT.regenerate}</span>
           </button>
 
           <button 
             onClick={handleWhatsappPrint} 
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl shadow flex items-center gap-1.5 text-sm transition"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl shadow flex items-center gap-1.5 text-sm transition active:scale-95"
           >
-            <span>📱 واتساب (1 بالصفحة)</span>
+            <span>{curT.whatsappPrint}</span>
           </button>
 
           <button 
             onClick={() => window.print()} 
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl shadow flex items-center gap-1.5 text-sm transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl shadow flex items-center gap-1.5 text-sm transition active:scale-95"
           >
-            <span>🖨️ طباعة مطبعة (8 بالصفحة)</span>
+            <span>{curT.batchPrint}</span>
           </button>
 
-          <Link href="/admin" className="bg-gray-800 text-white font-bold px-4 py-2 rounded-xl hover:bg-black shadow text-sm transition">
-            العودة &rarr;
+          <Link href="/admin" className="bg-gray-800 text-white font-bold px-4 py-2 rounded-xl hover:bg-black shadow text-sm transition active:scale-95">
+            {curT.back} {lang === 'en' ? '→' : '←'}
           </Link>
         </div>
       </div>
@@ -129,10 +221,10 @@ export default function Cards() {
       <div className="mb-6 bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 text-white p-5 rounded-2xl shadow-md print-hidden flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
           <h2 className="text-lg md:text-xl font-black text-amber-200 flex items-center gap-2">
-            <span>📦</span> تحميل كل الكارنيهات الجاهزة (مضغوطة ZIP)
+            <span>📦</span> {curT.zipTitle}
           </h2>
           <p className="text-gray-300 text-xs md:text-sm mt-1">
-            تم توليد الكارنيهات بدقة عالية باسم كل طالب والـ QR Code الخاص به بدون صور.
+            {curT.zipSubtitle}
           </p>
         </div>
 
@@ -142,21 +234,21 @@ export default function Cards() {
             download="كل_الكارنيهات.zip"
             className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-4 py-2 rounded-xl shadow text-xs md:text-sm transition flex items-center gap-1"
           >
-            <span>⬇️ تحميل الكل ({youths.length})</span>
+            <span>{curT.downloadAll(youths.length)}</span>
           </a>
           <a
             href="/cards/boys_cards.zip"
             download="كارنيهات_الولاد.zip"
             className="bg-blue-600 hover:bg-blue-500 text-white font-black px-4 py-2 rounded-xl shadow text-xs md:text-sm transition flex items-center gap-1"
           >
-            <span>👦 تحميل الولاد ({boysCount})</span>
+            <span>{curT.downloadBoys(boysCount)}</span>
           </a>
           <a
             href="/cards/girls_cards.zip"
             download="كارنيهات_البنات.zip"
             className="bg-pink-600 hover:bg-pink-500 text-white font-black px-4 py-2 rounded-xl shadow text-xs md:text-sm transition flex items-center gap-1"
           >
-            <span>👧 تحميل البنات ({girlsCount})</span>
+            <span>{curT.downloadGirls(girlsCount)}</span>
           </a>
         </div>
       </div>
@@ -165,28 +257,32 @@ export default function Cards() {
       <div className="mb-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-200 print-hidden flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
-            {["الكل", "ولد", "بنت"].map(gender => (
+            {[
+              { key: "الكل", label: curT.all },
+              { key: "ولد", label: curT.boys },
+              { key: "بنت", label: curT.girls }
+            ].map(item => (
               <button
-                key={gender}
-                onClick={() => setSelectedGender(gender)}
-                className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-black transition ${selectedGender === gender ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-black'}`}
+                key={item.key}
+                onClick={() => setSelectedGender(item.key)}
+                className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-black transition ${selectedGender === item.key ? 'bg-blue-600 text-white shadow-xs' : 'text-gray-600 hover:text-black'}`}
               >
-                {gender === "الكل" ? "الكل" : gender === "ولد" ? "👦 ولاد" : "👧 بنات"}
+                {item.label}
               </button>
             ))}
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-xs font-bold text-gray-500">المرحلة:</label>
+            <label className="text-xs font-bold text-gray-500">{curT.gradeLabel}</label>
             <select
               value={selectedGrade}
               onChange={e => setSelectedGrade(e.target.value)}
               className="border border-gray-300 rounded-xl px-3 py-1.5 text-xs md:text-sm font-bold bg-white text-gray-800 focus:outline-none focus:border-blue-500"
             >
-              <option value="الكل">كل المراحل</option>
-              <option value="أولى ثانوي">أولى ثانوي</option>
-              <option value="تانية ثانوي">تانية ثانوي</option>
-              <option value="تالتة ثانوي">تالتة ثانوي</option>
+              <option value="الكل">{curT.allGrades}</option>
+              <option value="أولى ثانوي">{curT.grades["أولى ثانوي"] || "أولى ثانوي"}</option>
+              <option value="تانية ثانوي">{curT.grades["تانية ثانوي"] || "تانية ثانوي"}</option>
+              <option value="تالتة ثانوي">{curT.grades["تالتة ثانوي"] || "تالتة ثانوي"}</option>
             </select>
           </div>
         </div>
@@ -194,7 +290,7 @@ export default function Cards() {
         <div className="w-full sm:w-64">
           <input
             type="text"
-            placeholder="🔍 بحث باسم الطالب..."
+            placeholder={curT.searchPlaceholder}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="w-full border border-gray-300 rounded-xl px-3 py-1.5 text-xs md:text-sm font-bold placeholder-gray-400 focus:outline-none focus:border-blue-500"
@@ -238,18 +334,18 @@ export default function Cards() {
 
                 {/* Student Name */}
                 <div 
-                  className="absolute flex items-center justify-center text-center px-2"
+                  className="absolute flex items-center justify-center text-center px-1"
                   style={{
-                    left: '44.5%',
-                    top: '47.0%',
-                    width: '42.0%',
-                    height: '10.8%'
+                    left: '43.5%',
+                    top: '44.0%',
+                    width: '43.0%',
+                    height: '12.0%'
                   }}
                 >
                   <span 
-                    className="font-black text-[#420b12] leading-tight block w-full truncate"
+                    className="font-black text-[#420b12] leading-tight block w-full whitespace-nowrap overflow-hidden text-ellipsis"
                     style={{
-                      fontSize: y.name.length > 25 ? '11px' : y.name.length > 20 ? '12.5px' : y.name.length > 16 ? '14px' : '15.5px'
+                      fontSize: y.name.length > 25 ? '9px' : y.name.length > 20 ? '10px' : y.name.length > 15 ? '11px' : '12.5px'
                     }}
                   >
                     {y.name}
@@ -261,7 +357,7 @@ export default function Cards() {
                   href={cardImageUrl}
                   download={`كارنيه_${y.name}.png`}
                   className="absolute top-2 right-2 z-50 bg-gray-900/80 hover:bg-black text-white w-8 h-8 flex items-center justify-center rounded-full shadow-md print-hidden transition-all opacity-0 group-hover:opacity-100"
-                  title="تحميل الكارنيه كصورة PNG"
+                  title={curT.downloadCardTitle}
                 >
                   ⬇️
                 </a>
@@ -273,7 +369,7 @@ export default function Cards() {
 
       {filteredYouths.length === 0 && (
         <div className="text-center py-12 text-gray-500 font-bold text-lg bg-white rounded-2xl shadow-sm border border-gray-200">
-          لا يوجد طلاب مطابقين للبحث أو الفلتر المحدد.
+          {curT.noMatch}
         </div>
       )}
     </div>
