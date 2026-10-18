@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import sharp from 'sharp';
 import QRCode from 'qrcode';
+import { execSync } from 'child_process';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +38,7 @@ export async function POST() {
 
     for (const youth of youths) {
       const qrBuffer = await QRCode.toBuffer(youth.id, {
-        width: 134,
+        width: 290,
         margin: 1,
         color: {
           dark: '#1a1a1a',
@@ -46,17 +47,17 @@ export async function POST() {
       });
 
       const name = youth.name.trim();
-      let fontSize = 18;
+      let fontSize = 34;
       if (name.length > 25) {
-        fontSize = 13;
+        fontSize = 23;
       } else if (name.length > 20) {
-        fontSize = 15;
+        fontSize = 26;
       } else if (name.length > 16) {
-        fontSize = 16.5;
+        fontSize = 29;
       }
 
       const nameSvg = `
-        <svg width="220" height="40">
+        <svg width="430" height="76">
           <style>
             .name {
               font-family: 'Segoe UI', Tahoma, 'Arial', sans-serif;
@@ -65,14 +66,14 @@ export async function POST() {
               fill: #420b12;
             }
           </style>
-          <text x="110" y="27" class="name" text-anchor="middle">${name}</text>
+          <text x="215" y="46" class="name" text-anchor="middle">${name}</text>
         </svg>
       `;
 
       const cardBuffer = await sharp(templatePath)
         .composite([
-          { input: qrBuffer, left: 70, top: 140 },
-          { input: Buffer.from(nameSvg), left: 220, top: 238 }
+          { input: qrBuffer, left: 110, top: 301 },
+          { input: Buffer.from(nameSvg), left: 455, top: 332 }
         ])
         .png()
         .toBuffer();
@@ -87,6 +88,15 @@ export async function POST() {
       } else {
         fs.writeFileSync(path.join(boysDir, filename), cardBuffer);
       }
+    }
+
+    // Attempt to update ZIP archives if PowerShell is available
+    try {
+      execSync(`powershell -NoProfile -Command "Compress-Archive -Path 'public/cards/*.png' -DestinationPath 'public/cards/all_cards.zip' -Force"`);
+      execSync(`powershell -NoProfile -Command "Compress-Archive -Path 'public/cards/ولاد/*.png' -DestinationPath 'public/cards/boys_cards.zip' -Force"`);
+      execSync(`powershell -NoProfile -Command "Compress-Archive -Path 'public/cards/بنات/*.png' -DestinationPath 'public/cards/girls_cards.zip' -Force"`);
+    } catch (zipErr) {
+      console.warn('Could not compress zip archives in API route:', zipErr);
     }
 
     return NextResponse.json({ success: true, count: youths.length });

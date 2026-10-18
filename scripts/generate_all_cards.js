@@ -3,6 +3,7 @@ const path = require('path');
 const sharp = require('sharp');
 const QRCode = require('qrcode');
 const { PrismaClient } = require('@prisma/client');
+const { execSync } = require('child_process');
 
 process.env.DATABASE_URL = "postgresql://neondb_owner:npg_ZbXp1gl0nxVq@ep-bold-flower-b7e000mc-pooler.c-13.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require";
 const prisma = new PrismaClient();
@@ -25,7 +26,7 @@ function sanitizeFilename(name) {
 async function generateCard(youth) {
   // Generate QR buffer
   const qrBuffer = await QRCode.toBuffer(youth.id, {
-    width: 134,
+    width: 290,
     margin: 1,
     color: {
       dark: '#1a1a1a',
@@ -35,17 +36,17 @@ async function generateCard(youth) {
 
   // Calculate font size based on name length
   const name = youth.name.trim();
-  let fontSize = 18;
+  let fontSize = 34;
   if (name.length > 25) {
-    fontSize = 13;
+    fontSize = 23;
   } else if (name.length > 20) {
-    fontSize = 15;
+    fontSize = 26;
   } else if (name.length > 16) {
-    fontSize = 16.5;
+    fontSize = 29;
   }
 
   const nameSvg = `
-    <svg width="220" height="40">
+    <svg width="430" height="76">
       <style>
         .name {
           font-family: 'Segoe UI', Tahoma, 'Arial', sans-serif;
@@ -54,7 +55,7 @@ async function generateCard(youth) {
           fill: #420b12;
         }
       </style>
-      <text x="110" y="27" class="name" text-anchor="middle">${name}</text>
+      <text x="215" y="46" class="name" text-anchor="middle">${name}</text>
     </svg>
   `;
   const nameBuffer = Buffer.from(nameSvg);
@@ -63,13 +64,13 @@ async function generateCard(youth) {
     .composite([
       {
         input: qrBuffer,
-        left: 70,
-        top: 140
+        left: 110,
+        top: 301
       },
       {
         input: nameBuffer,
-        left: 220,
-        top: 238
+        left: 455,
+        top: 332
       }
     ])
     .png()
@@ -92,10 +93,45 @@ async function generateCard(youth) {
   return filename;
 }
 
+function createZipArchives() {
+  console.log('\nCreating/Updating zip archives...');
+  try {
+    const allCardsZip = path.join(OUTPUT_DIR, 'all_cards.zip');
+    const boysCardsZip = path.join(OUTPUT_DIR, 'boys_cards.zip');
+    const girlsCardsZip = path.join(OUTPUT_DIR, 'girls_cards.zip');
+
+    if (fs.existsSync(allCardsZip)) fs.unlinkSync(allCardsZip);
+    if (fs.existsSync(boysCardsZip)) fs.unlinkSync(boysCardsZip);
+    if (fs.existsSync(girlsCardsZip)) fs.unlinkSync(girlsCardsZip);
+
+    execSync(`powershell -NoProfile -Command "Compress-Archive -Path 'public/cards/*.png' -DestinationPath 'public/cards/all_cards.zip' -Force"`, { stdio: 'inherit' });
+    execSync(`powershell -NoProfile -Command "Compress-Archive -Path 'public/cards/ولاد/*.png' -DestinationPath 'public/cards/boys_cards.zip' -Force"`, { stdio: 'inherit' });
+    execSync(`powershell -NoProfile -Command "Compress-Archive -Path 'public/cards/بنات/*.png' -DestinationPath 'public/cards/girls_cards.zip' -Force"`, { stdio: 'inherit' });
+    console.log('Successfully created all 3 ZIP archives!');
+  } catch (err) {
+    console.error('Error creating ZIP archives:', err.message);
+  }
+}
+
 async function main() {
   ensureDir(OUTPUT_DIR);
   ensureDir(BOYS_DIR);
   ensureDir(GIRLS_DIR);
+
+  // Clean old png files from cards directories
+  const cleanDir = (d) => {
+    if (fs.existsSync(d)) {
+      const files = fs.readdirSync(d);
+      for (const file of files) {
+        if (file.endsWith('.png')) {
+          fs.unlinkSync(path.join(d, file));
+        }
+      }
+    }
+  };
+  cleanDir(OUTPUT_DIR);
+  cleanDir(BOYS_DIR);
+  cleanDir(GIRLS_DIR);
 
   const youths = await prisma.youth.findMany({
     orderBy: [
@@ -114,6 +150,7 @@ async function main() {
   }
 
   console.log(`\nAll ${count} cards generated successfully in: ${OUTPUT_DIR}`);
+  createZipArchives();
 }
 
 main()

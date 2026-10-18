@@ -64,7 +64,7 @@ export default function Cards() {
       <style>{`
         @media print {
           @page { 
-            size: ${isWhatsappMode ? '9cm 6cm' : 'A4'}; 
+            size: ${isWhatsappMode ? '9cm 6.2cm' : 'A4'}; 
             margin: 0; 
           }
           body { 
@@ -213,37 +213,37 @@ export default function Cards() {
             <div key={y.id} className={isWhatsappMode ? 'print:break-after-page print:m-0 print:p-0' : ''}>
               <div 
                 id={`card-${y.id}`} 
-                className="group relative w-[9cm] max-w-[calc(100vw-2rem)] h-[6cm] max-h-[calc((100vw-2rem)*2/3)] rounded-2xl overflow-hidden shadow-md border-2 border-amber-900/20 print:w-[9cm] print:h-[6cm] print:border-none print:shadow-none break-inside-avoid print:m-0 bg-cover bg-center select-none mx-auto"
+                className="group relative w-[9cm] max-w-[calc(100vw-2rem)] h-[6.2cm] max-h-[calc((100vw-2rem)*6.2/9)] rounded-2xl overflow-hidden shadow-md border-2 border-amber-900/20 print:w-[9cm] print:h-[6.2cm] print:border-none print:shadow-none break-inside-avoid print:m-0 bg-cover bg-center select-none mx-auto"
                 style={{ backgroundImage: "url('/card-template.png')" }}
               >
                 {/* QR Code Container */}
                 <div 
                   className="absolute flex items-center justify-center"
                   style={{
-                    left: '13.1%',
-                    top: '39.4%',
-                    width: '25.1%',
-                    height: '37.7%'
+                    left: '7.3%',
+                    top: '38.8%',
+                    width: '35.2%',
+                    height: '48.6%'
                   }}
                 >
                   <QRCodeSVG 
                     value={y.id} 
-                    size={80}
+                    size={110}
                     level="M"
                     fgColor="#1a1a1a"
                     bgColor="transparent"
-                    className="w-full h-full object-contain p-0.5"
+                    className="w-[82%] h-[82%] object-contain"
                   />
                 </div>
 
                 {/* Student Name */}
                 <div 
-                  className="absolute flex items-center justify-center text-center px-1"
+                  className="absolute flex items-center justify-center text-center px-2"
                   style={{
-                    left: '41.2%',
-                    top: '67.0%',
-                    width: '41.2%',
-                    height: '11.2%'
+                    left: '44.5%',
+                    top: '47.0%',
+                    width: '42.0%',
+                    height: '10.8%'
                   }}
                 >
                   <span 
