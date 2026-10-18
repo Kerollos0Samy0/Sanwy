@@ -55,7 +55,7 @@ async function generateCard(youth) {
           fill: #420b12;
         }
       </style>
-      <text x="215" y="42" class="name" text-anchor="middle">${name}</text>
+      <text x="215" y="45" class="name" text-anchor="middle">${name}</text>
     </svg>
   `;
   const nameBuffer = Buffer.from(nameSvg);

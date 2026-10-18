@@ -337,15 +337,15 @@ export default function Cards() {
                   className="absolute flex items-center justify-center text-center px-1"
                   style={{
                     left: '43.5%',
-                    top: '44.0%',
+                    top: '45.8%',
                     width: '43.0%',
-                    height: '12.0%'
+                    height: '11.5%'
                   }}
                 >
                   <span 
                     className="font-black text-[#420b12] leading-tight block w-full whitespace-nowrap overflow-hidden text-ellipsis"
                     style={{
-                      fontSize: y.name.length > 25 ? '9px' : y.name.length > 20 ? '10px' : y.name.length > 15 ? '11px' : '12.5px'
+                      fontSize: y.name.length > 25 ? '9.5px' : y.name.length > 20 ? '10.5px' : y.name.length > 15 ? '11.5px' : '13px'
                     }}
                   >
                     {y.name}
