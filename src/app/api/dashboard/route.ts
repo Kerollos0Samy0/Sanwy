@@ -12,10 +12,10 @@ export async function GET() {
   const overall = [...youth].sort((a, b) => b.totalPoints - a.totalPoints);
 
   // دالة لحساب وترتيب المخدومين في نشاط معين من الأول للأخير
-  const getTopByReason = (reason: string) => {
+  const getTopByReason = (reason: string, altReason?: string) => {
     const scores = youth.map(y => {
       const score = y.pointsLogs
-        .filter(log => log.reason === reason)
+        .filter(log => log.reason === reason || (altReason && log.reason === altReason))
         .reduce((sum, log) => sum + log.points, 0);
       return { ...y, categoryScore: score };
     });
@@ -26,7 +26,7 @@ export async function GET() {
   };
 
   const topLiturgy = getTopByReason("القداس");
-  const topConfession = getTopByReason("الاعتراف"); // تم استبدال التناول بالاعتراف
+  const topConfession = getTopByReason("الاعتراف", "اعتراف"); // يشمل الاعتراف واعتراف
   const topTasbeha = getTopByReason("التسبحة");
   const topService = getTopByReason("الخدمة");
   const topVespers = getTopByReason("العشية");

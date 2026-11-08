@@ -14,8 +14,10 @@ export async function POST(req: Request) {
   const body = await req.json();
   let { youthId, reason, points, servantName, preventDuplicateToday, force } = body;
 
+  const isConfession = reason === "الاعتراف" || reason === "اعتراف";
+
   // 1. قاعدة الاعتراف: مرة واحدة في الشهر فقط
-  if (reason === "الاعتراف" && points > 0) {
+  if (isConfession && points > 0) {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     startOfMonth.setHours(0, 0, 0, 0);
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
     const confessionThisMonth = await prisma.pointsLog.findFirst({
       where: {
         youthId,
-        reason: "الاعتراف",
+        reason: { in: ["الاعتراف", "اعتراف"] },
         createdAt: { gte: startOfMonth },
         points: { gt: 0 }
       }
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
   }
 
   // 2. منع التكرار اليومي للأنشطة الأخرى (إذا تم تفعيل الخيار)
-  if (preventDuplicateToday && reason !== "الاعتراف" && !force) {
+  if (preventDuplicateToday && !isConfession && !force) {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const existingLog = await prisma.pointsLog.findFirst({
@@ -73,7 +75,6 @@ export async function POST(req: Request) {
     if (liturgiesThisWeek > 0) {
       points = 10;
     }
-    // إذا كان أول قداس هذا الأسبوع، يُحسب بالنقاط المرسلة المحددة لهذا الأسبوع دون إجبار على 50
   }
 
   const youth = await prisma.youth.update({
