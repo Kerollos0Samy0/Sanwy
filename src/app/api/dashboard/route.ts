@@ -8,10 +8,10 @@ export async function GET() {
     include: { pointsLogs: true }
   });
 
-  // الترتيب العام (من لديهم نقاط فقط)
-  const overall = [...youth].filter(y => y.totalPoints > 0).sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 5);
+  // الترتيب العام: جميع المخدومين مرتبين من الأول للأخير (تنازلياً حسب النقاط)
+  const overall = [...youth].sort((a, b) => b.totalPoints - a.totalPoints);
 
-  // دالة لحساب أعلى ناس في تصنيف معين
+  // دالة لحساب وترتيب المخدومين في نشاط معين من الأول للأخير
   const getTopByReason = (reason: string) => {
     const scores = youth.map(y => {
       const score = y.pointsLogs
@@ -19,24 +19,26 @@ export async function GET() {
         .reduce((sum, log) => sum + log.points, 0);
       return { ...y, categoryScore: score };
     });
-    // تصفية اللي ليهم نقط وترتيبهم ونجيب أول 5
-    return scores.filter(y => y.categoryScore > 0).sort((a, b) => b.categoryScore - a.categoryScore).slice(0, 5);
+    // ترتيب جميع من لديهم نقاط في هذا النشاط من الأول للأخير
+    return scores
+      .filter(y => y.categoryScore > 0)
+      .sort((a, b) => b.categoryScore - a.categoryScore);
   };
 
   const topLiturgy = getTopByReason("القداس");
+  const topConfession = getTopByReason("الاعتراف"); // تم استبدال التناول بالاعتراف
   const topTasbeha = getTopByReason("التسبحة");
   const topService = getTopByReason("الخدمة");
   const topVespers = getTopByReason("العشية");
-  const topCommunion = getTopByReason("التناول");
   const topMercy = getTopByReason("أعمال رحمة");
 
   return NextResponse.json({
     overall,
     topLiturgy,
+    topConfession,
     topTasbeha,
     topService,
     topVespers,
-    topCommunion,
     topMercy
   });
 }

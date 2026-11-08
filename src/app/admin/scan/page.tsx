@@ -1,8 +1,17 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import Link from "next/link";
 import { fireConfetti, playSuccessSound } from "@/lib/effects";
+
+const ACTIVITIES = [
+  { id: 'liturgy', name: 'القداس', defaultPoints: 50, color: 'bg-blue-100 text-blue-900 border-blue-400', icon: '⛪' },
+  { id: 'confession', name: 'الاعتراف', defaultPoints: 50, color: 'bg-teal-100 text-teal-900 border-teal-400', icon: '🙏' },
+  { id: 'tasbeha', name: 'التسبحة', defaultPoints: 30, color: 'bg-purple-100 text-purple-900 border-purple-400', icon: '🎵' },
+  { id: 'vespers', name: 'العشية', defaultPoints: 20, color: 'bg-orange-100 text-orange-900 border-orange-400', icon: '🌅' },
+  { id: 'service', name: 'الخدمة', defaultPoints: 30, color: 'bg-rose-100 text-rose-900 border-rose-400', icon: '❤️' },
+  { id: 'mercy', name: 'أعمال رحمة', defaultPoints: 50, color: 'bg-fuchsia-100 text-fuchsia-900 border-fuchsia-400', icon: '🕊️' },
+];
 
 export default function Scan() {
   const [currentServant, setCurrentServant] = useState("أدمن");
@@ -11,14 +20,54 @@ export default function Scan() {
   const lastScanTime = useRef<{ [key: string]: number }>({});
   const [preventDuplicateToday, setPreventDuplicateToday] = useState(true);
 
-  const ACTIVITIES = [
-    { id: 'liturgy', name: 'القداس', defaultPoints: 50, color: 'bg-blue-100 text-blue-900 border-blue-400' },
-    { id: 'communion', name: 'التناول', defaultPoints: 20, color: 'bg-teal-100 text-teal-900 border-teal-400' },
-    { id: 'tasbeha', name: 'التسبحة', defaultPoints: 30, color: 'bg-purple-100 text-purple-900 border-purple-400' },
-    { id: 'vespers', name: 'العشية', defaultPoints: 20, color: 'bg-orange-100 text-orange-900 border-orange-400' },
-    { id: 'service', name: 'الخدمة', defaultPoints: 30, color: 'bg-rose-100 text-rose-900 border-rose-400' },
-    { id: 'mercy', name: 'أعمال رحمة', defaultPoints: 50, color: 'bg-fuchsia-100 text-fuchsia-900 border-fuchsia-400' },
-  ];
+  // Weekly points configuration
+  const [weeklyPoints, setWeeklyPoints] = useState<Record<string, number>>({
+    'القداس': 50,
+    'الاعتراف': 50,
+    'التسبحة': 30,
+    'العشية': 20,
+    'الخدمة': 30,
+    'أعمال رحمة': 50,
+  });
+  const [showPointsConfig, setShowPointsConfig] = useState(false);
+  const [tempPoints, setTempPoints] = useState<Record<string, number>>(weeklyPoints);
+  const [isSavingPoints, setIsSavingPoints] = useState(false);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState("");
+
+  // Load weekly points on mount
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data === 'object') {
+          setWeeklyPoints(prev => ({ ...prev, ...data }));
+          setTempPoints(prev => ({ ...prev, ...data }));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSaveWeeklyPoints = async () => {
+    setIsSavingPoints(true);
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tempPoints)
+      });
+      if (res.ok) {
+        setWeeklyPoints(tempPoints);
+        setSaveSuccessMsg("تم حفظ درجات هذا الأسبوع بنجاح ✅");
+        setTimeout(() => setSaveSuccessMsg(""), 3000);
+      } else {
+        alert("فشل في حفظ إعدادات الدرجات");
+      }
+    } catch {
+      alert("حدث خطأ أثناء الاتصال بالخادم");
+    } finally {
+      setIsSavingPoints(false);
+    }
+  };
 
   const toggleActivity = (act: any) => {
     if (selectedActivities.find(a => a.id === act.id)) {
@@ -57,12 +106,15 @@ export default function Scan() {
       const msgs: string[] = [];
 
       for (const act of selectedActivities) {
+        const pointsToAssign = weeklyPoints[act.name] !== undefined ? weeklyPoints[act.name] : act.defaultPoints;
+
         const res = await fetch('/api/points', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             youthId: id, 
             reason: act.name, 
-            points: act.defaultPoints, 
+            points: pointsToAssign, 
             servantName: currentServant || "أدمن",
             preventDuplicateToday
           })
@@ -70,14 +122,16 @@ export default function Scan() {
 
         if (!res.ok) {
           const errData = await res.json();
-          if (errData.error === 'duplicate_today') {
-            msgs.push(`⚠️ ${act.name}: مسجل من قبل`);
+          if (errData.error === 'duplicate_month') {
+            msgs.push(`⚠️ ${act.name}: مسجل هذا الشهر بالفعل (مرة شهرياً)`);
+          } else if (errData.error === 'duplicate_today') {
+            msgs.push(`⚠️ ${act.name}: مسجل من قبل اليوم`);
           } else {
             msgs.push(`❌ ${act.name}: خطأ`);
           }
         } else {
           hasSuccess = true;
-          msgs.push(`✅ ${act.name}`);
+          msgs.push(`✅ ${act.name} (+${pointsToAssign})`);
         }
       }
 
@@ -128,12 +182,71 @@ export default function Scan() {
             </Link>
           </div>
         </div>
+
+        {/* Weekly Points Config Box (Toggleable) */}
+        <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200 mb-5">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">⚙️</span>
+              <div>
+                <h3 className="font-black text-gray-800 text-sm sm:text-base">
+                  تحديد درجات الأنشطة لهذا الأسبوع
+                </h3>
+                <p className="text-xs text-gray-500 font-bold">
+                  يمكنك تغيير نقاط القداس أو أي نشاط قبل البدء في المسح (مثلاً القداس بـ 100 بدل 50)
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowPointsConfig(!showPointsConfig)}
+              className="bg-blue-50 hover:bg-blue-100 text-blue-700 font-black px-3.5 py-1.5 rounded-xl border border-blue-200 text-xs sm:text-sm transition active:scale-95"
+            >
+              {showPointsConfig ? "إخفاء لوحة التعديل ✕" : "تعديل درجات هذا الأسبوع ✏️"}
+            </button>
+          </div>
+
+          {showPointsConfig && (
+            <div className="mt-4 pt-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-4">
+                {ACTIVITIES.map(act => (
+                  <div key={act.id} className="bg-gray-50 p-2.5 rounded-xl border border-gray-200 text-center">
+                    <label className="block text-xs font-black text-gray-700 mb-1">
+                      {act.icon} {act.name}
+                    </label>
+                    <div className="flex items-center justify-center gap-1">
+                      <input 
+                        type="number"
+                        value={tempPoints[act.name] !== undefined ? tempPoints[act.name] : act.defaultPoints}
+                        onChange={e => setTempPoints({ ...tempPoints, [act.name]: parseInt(e.target.value) || 0 })}
+                        className="w-16 text-center font-black text-base border-2 border-blue-300 rounded-lg p-1 bg-white focus:outline-none focus:border-blue-600 text-blue-900"
+                      />
+                      <span className="text-xs font-bold text-gray-500">نقطة</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <span className="text-green-700 font-bold text-xs sm:text-sm">
+                  {saveSuccessMsg}
+                </span>
+                <button
+                  onClick={handleSaveWeeklyPoints}
+                  disabled={isSavingPoints}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-black px-5 py-2 rounded-xl text-xs sm:text-sm shadow-sm transition active:scale-95 disabled:opacity-50"
+                >
+                  {isSavingPoints ? "جاري الحفظ..." : "حفظ الدرجات لهذا الأسبوع 💾"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         
-        {/* Activities Selection (Always at top for mobile) */}
+        {/* Activities Selection (Always visible at top for mobile) */}
         <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border-t-4 border-blue-600 mb-5">
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-base sm:text-lg font-black text-gray-800">
-              1. حدد الأنشطة المراد رصدها:
+              1. حدد الأنشطة المراد رصدها عند المسح:
             </h2>
             <label className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-600 cursor-pointer">
               <input 
@@ -149,13 +262,15 @@ export default function Scan() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
             {ACTIVITIES.map(act => {
               const isSelected = selectedActivities.find(a => a.id === act.id);
+              const currentPts = weeklyPoints[act.name] !== undefined ? weeklyPoints[act.name] : act.defaultPoints;
+
               return (
                 <button 
                   key={act.id}
                   onClick={() => toggleActivity(act)}
-                  className={`py-3 px-2 rounded-xl font-black text-xs sm:text-sm transition-all border-2 text-center active:scale-95 ${isSelected ? act.color + ' ring-2 ring-blue-400 shadow-sm scale-[1.02]' : 'bg-gray-50 text-gray-500 border-gray-200'}`}
+                  className={`py-3 px-2 rounded-xl font-black text-xs sm:text-sm transition-all border-2 text-center active:scale-95 ${isSelected ? act.color + ' ring-2 ring-blue-400 shadow-sm scale-[1.02]' : 'bg-gray-50 text-gray-600 border-gray-200'}`}
                 >
-                  {isSelected ? '✅ ' : ''}{act.name} (+{act.defaultPoints})
+                  {isSelected ? '✅ ' : ''}{act.icon} {act.name} (+{currentPts})
                 </button>
               );
             })}
@@ -165,7 +280,7 @@ export default function Scan() {
         {/* Main Grid: Camera Scanner & Logs */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           
-          {/* Camera Scanner (Takes priority on mobile) */}
+          {/* Camera Scanner */}
           <div className="bg-gray-950 rounded-2xl overflow-hidden shadow-lg border-4 border-gray-800 relative flex flex-col">
             <div className="bg-gray-900 text-white text-center py-2.5 font-bold text-sm sm:text-base border-b border-gray-800 flex items-center justify-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>

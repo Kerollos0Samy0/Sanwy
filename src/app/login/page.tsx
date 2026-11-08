@@ -9,22 +9,28 @@ export default function Login() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (!password) return;
+    if (!password.trim()) return;
     setLoading(true);
+    setError("");
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ password: password.trim() })
       });
       
-      if (res.ok) {
-        router.push('/dashboard');
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.role === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/admin');
+        }
       } else {
-        setError('الرقم السري غير صحيح!');
+        setError(data.message || 'الرقم السري غير صحيح!');
       }
     } catch {
-      setError('حدث خطأ في الاتصال!');
+      setError('حدث خطأ في الاتصال بالسيرفر!');
     } finally {
       setLoading(false);
     }
@@ -35,10 +41,12 @@ export default function Login() {
       <div className="bg-white p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl shadow-lg max-w-sm w-full text-center border-t-6 sm:border-t-8 border-blue-600 border border-gray-200">
         <img src="/logo.png" alt="Logo" className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4 sm:mb-6 rounded-full border-2 border-gray-100 shadow-sm object-cover" />
         <h1 className="text-2xl sm:text-3xl font-black text-gray-900 mb-1">تسجيل الدخول</h1>
-        <p className="text-gray-500 font-bold text-xs sm:text-sm mb-6">خدام اجتماع شباب ثانوي</p>
+        <p className="text-gray-500 font-bold text-xs sm:text-sm mb-5">
+          خدام ومشرفي اجتماع شباب ثانوي
+        </p>
         
         {error && (
-          <div className="bg-red-50 text-red-600 font-bold p-3 rounded-xl mb-4 border border-red-200 text-xs sm:text-sm">
+          <div className="bg-red-50 text-red-600 font-bold p-3 rounded-xl mb-4 border border-red-200 text-xs sm:text-sm animate-fade-in">
             {error}
           </div>
         )}
@@ -53,11 +61,15 @@ export default function Login() {
         />
         <button 
           onClick={handleLogin}
-          disabled={loading}
+          disabled={loading || !password.trim()}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 sm:py-4 rounded-xl text-base sm:text-lg shadow-md transition active:scale-95 disabled:opacity-50"
         >
-          {loading ? "جاري الدخول..." : "دخول للنظام 🚀"}
+          {loading ? "جاري التحقق..." : "دخول للنظام 🚀"}
         </button>
+
+        <p className="text-[11px] text-gray-400 font-bold mt-5">
+          🔒 يمكن الدخول بالرقم السري الخاص بالخدام أو الخاص بالأدمن
+        </p>
       </div>
     </div>
   );

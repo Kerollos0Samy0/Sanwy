@@ -12,8 +12,56 @@ export default function RecordPoints() {
   const [customPoints, setCustomPoints] = useState<{ [key: string]: number }>({});
   const [customReason, setCustomReason] = useState<{ [key: string]: string }>({});
 
+  // Weekly points from settings
+  const [weeklyPoints, setWeeklyPoints] = useState<Record<string, number>>({
+    'القداس': 50,
+    'الاعتراف': 50,
+    'التسبحة': 30,
+    'العشية': 20,
+    'الخدمة': 30,
+    'أعمال رحمة': 50,
+  });
+  const [showConfig, setShowConfig] = useState(false);
+  const [tempPoints, setTempPoints] = useState<Record<string, number>>(weeklyPoints);
+  const [isSavingPoints, setIsSavingPoints] = useState(false);
+  const [configMsg, setConfigMsg] = useState("");
+
   const fetchYouths = () => fetch('/api/youth').then(res => res.json()).then(setYouths);
-  useEffect(() => { fetchYouths(); }, []);
+  
+  useEffect(() => { 
+    fetchYouths(); 
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data === 'object') {
+          setWeeklyPoints(prev => ({ ...prev, ...data }));
+          setTempPoints(prev => ({ ...prev, ...data }));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSaveWeeklyPoints = async () => {
+    setIsSavingPoints(true);
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tempPoints)
+      });
+      if (res.ok) {
+        setWeeklyPoints(tempPoints);
+        setConfigMsg("تم حفظ درجات هذا الأسبوع بنجاح ✅");
+        setTimeout(() => setConfigMsg(""), 3000);
+      } else {
+        alert("فشل في حفظ الدرجات");
+      }
+    } catch {
+      alert("حدث خطأ في الاتصال بالخادم");
+    } finally {
+      setIsSavingPoints(false);
+    }
+  };
 
   const GRADES = ["أولى ثانوي", "تانية ثانوي", "تالتة ثانوي"];
 
@@ -51,18 +99,25 @@ export default function RecordPoints() {
     
     const res = await fetch('/api/points', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         youthId: id, 
         reason, 
         points, 
         servantName: currentServant || "أدمن",
-        preventDuplicateToday: !force
+        preventDuplicateToday: !force,
+        force
       })
     });
 
     if (!res.ok) {
       const data = await res.json();
-      if (data.error === 'duplicate_today') {
+      if (data.error === 'duplicate_month') {
+        const confirmForce = confirm(`${data.msg}\nهل تريد تسجيله استثنائياً لهذا الشهر؟`);
+        if (confirmForce) {
+          handleAddPoints(id, points, reason, true);
+        }
+      } else if (data.error === 'duplicate_today') {
         const confirmForce = confirm(`${data.msg}\nهل تريد تسجيلها مرة أخرى على أي حال؟`);
         if (confirmForce) {
           handleAddPoints(id, points, reason, true);
@@ -93,11 +148,17 @@ export default function RecordPoints() {
               <span>✍️</span> تسجيل النقاط
             </h1>
             <p className="text-xs sm:text-sm font-bold text-gray-500 mt-0.5">
-              رصد الأنشطة اليومية وحضور القداسات
+              رصد الأنشطة اليومية وحضور القداسات والاعترافات
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+            <button
+              onClick={() => setShowConfig(!showConfig)}
+              className="bg-blue-50 hover:bg-blue-100 text-blue-800 px-3 py-1.5 rounded-xl border border-blue-200 text-xs sm:text-sm font-bold transition active:scale-95"
+            >
+              ⚙️ {showConfig ? "إخفاء الدرجات" : "تعديل درجات الأسبوع"}
+            </button>
             <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-200 shadow-inner">
               <label className="text-gray-600 font-bold text-xs whitespace-nowrap">الخادم:</label>
               <input 
@@ -113,6 +174,47 @@ export default function RecordPoints() {
             </Link>
           </div>
         </div>
+
+        {/* Weekly Points Config Box (Toggleable) */}
+        {showConfig && (
+          <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200 mb-5">
+            <div className="flex justify-between items-center mb-3 pb-2 border-b border-gray-100">
+              <h3 className="font-black text-gray-800 text-sm sm:text-base">
+                ⚙️ درجات الأنشطة المحددة لهذا الأسبوع:
+              </h3>
+              <span className="text-xs text-green-700 font-bold">{configMsg}</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 mb-3">
+              {[
+                { name: 'القداس', icon: '⛪' },
+                { name: 'الاعتراف', icon: '🙏' },
+                { name: 'التسبحة', icon: '🎵' },
+                { name: 'العشية', icon: '🌅' },
+                { name: 'الخدمة', icon: '❤️' },
+                { name: 'أعمال رحمة', icon: '🕊️' },
+              ].map(item => (
+                <div key={item.name} className="bg-gray-50 p-2 rounded-xl border border-gray-200 text-center">
+                  <label className="block text-xs font-black text-gray-700 mb-1">{item.icon} {item.name}</label>
+                  <input 
+                    type="number"
+                    value={tempPoints[item.name] || 0}
+                    onChange={e => setTempPoints({ ...tempPoints, [item.name]: parseInt(e.target.value) || 0 })}
+                    className="w-16 text-center font-black text-sm border-2 border-blue-300 rounded-lg p-1 bg-white focus:outline-none focus:border-blue-600 text-blue-900"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="text-left">
+              <button
+                onClick={handleSaveWeeklyPoints}
+                disabled={isSavingPoints}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-black px-4 py-1.5 rounded-xl text-xs sm:text-sm shadow-sm transition active:scale-95 disabled:opacity-50"
+              >
+                {isSavingPoints ? "جاري الحفظ..." : "حفظ الدرجات 💾"}
+              </button>
+            </div>
+          </div>
+        )}
         
         {/* Search & Filters */}
         <div className="bg-white p-3.5 sm:p-5 rounded-2xl shadow-sm mb-5 border border-gray-200 flex flex-col gap-3">
@@ -195,43 +297,44 @@ export default function RecordPoints() {
                   </div>
                 </div>
                 
-                {/* Quick Points Buttons (2 cols on small mobile, 3 cols on tablet/desktop) */}
+                {/* Quick Points Buttons (3x2 grid) */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-1 max-w-xl">
                   <button 
-                    onClick={() => handleAddPoints(y.id, 50, "القداس")} 
+                    onClick={() => handleAddPoints(y.id, weeklyPoints['القداس'] || 50, "القداس")} 
                     className="bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 py-2.5 px-2 rounded-xl font-black text-xs sm:text-sm transition active:scale-95 text-center"
                   >
-                    ⛪ القداس (50/10)
+                    ⛪ القداس (+{weeklyPoints['القداس'] || 50})
                   </button>
                   <button 
-                    onClick={() => handleAddPoints(y.id, 20, "التناول")} 
+                    onClick={() => handleAddPoints(y.id, weeklyPoints['الاعتراف'] || 50, "الاعتراف")} 
                     className="bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200 py-2.5 px-2 rounded-xl font-black text-xs sm:text-sm transition active:scale-95 text-center"
+                    title="الاعتراف مسموح به مرة واحدة شهرياً"
                   >
-                    🍞 التناول (+20)
+                    🙏 الاعتراف (+{weeklyPoints['الاعتراف'] || 50})
                   </button>
                   <button 
-                    onClick={() => handleAddPoints(y.id, 30, "التسبحة")} 
+                    onClick={() => handleAddPoints(y.id, weeklyPoints['التسبحة'] || 30, "التسبحة")} 
                     className="bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white border border-purple-200 py-2.5 px-2 rounded-xl font-black text-xs sm:text-sm transition active:scale-95 text-center"
                   >
-                    🎵 التسبحة (+30)
+                    🎵 التسبحة (+{weeklyPoints['التسبحة'] || 30})
                   </button>
                   <button 
-                    onClick={() => handleAddPoints(y.id, 20, "العشية")} 
+                    onClick={() => handleAddPoints(y.id, weeklyPoints['العشية'] || 20, "العشية")} 
                     className="bg-orange-50 hover:bg-orange-500 text-orange-700 hover:text-white border border-orange-200 py-2.5 px-2 rounded-xl font-black text-xs sm:text-sm transition active:scale-95 text-center"
                   >
-                    🌅 العشية (+20)
+                    🌅 العشية (+{weeklyPoints['العشية'] || 20})
                   </button>
                   <button 
-                    onClick={() => handleAddPoints(y.id, 30, "الخدمة")} 
+                    onClick={() => handleAddPoints(y.id, weeklyPoints['الخدمة'] || 30, "الخدمة")} 
                     className="bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 py-2.5 px-2 rounded-xl font-black text-xs sm:text-sm transition active:scale-95 text-center"
                   >
-                    ❤️ الخدمة (+30)
+                    ❤️ الخدمة (+{weeklyPoints['الخدمة'] || 30})
                   </button>
                   <button 
-                    onClick={() => handleAddPoints(y.id, 50, "أعمال رحمة")} 
+                    onClick={() => handleAddPoints(y.id, weeklyPoints['أعمال رحمة'] || 50, "أعمال رحمة")} 
                     className="bg-fuchsia-50 hover:bg-fuchsia-600 text-fuchsia-700 hover:text-white border border-fuchsia-200 py-2.5 px-2 rounded-xl font-black text-xs sm:text-sm transition active:scale-95 text-center"
                   >
-                    🕊️ أعمال رحمة (+50)
+                    🕊️ أعمال رحمة (+{weeklyPoints['أعمال رحمة'] || 50})
                   </button>
                 </div>
 

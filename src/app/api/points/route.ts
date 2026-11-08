@@ -12,9 +12,33 @@ function getStartOfWeek() {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  let { youthId, reason, points, servantName, preventDuplicateToday } = body;
+  let { youthId, reason, points, servantName, preventDuplicateToday, force } = body;
 
-  if (preventDuplicateToday) {
+  // 1. قاعدة الاعتراف: مرة واحدة في الشهر فقط
+  if (reason === "الاعتراف" && points > 0) {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const confessionThisMonth = await prisma.pointsLog.findFirst({
+      where: {
+        youthId,
+        reason: "الاعتراف",
+        createdAt: { gte: startOfMonth },
+        points: { gt: 0 }
+      }
+    });
+
+    if (confessionThisMonth && !force) {
+      return NextResponse.json({ 
+        error: 'duplicate_month', 
+        msg: `تم تسجيل الاعتراف لهذا المخدوم بالفعل هذا الشهر! (مرة واحدة فقط شهرياً)` 
+      }, { status: 400 });
+    }
+  }
+
+  // 2. منع التكرار اليومي للأنشطة الأخرى (إذا تم تفعيل الخيار)
+  if (preventDuplicateToday && reason !== "الاعتراف" && !force) {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const existingLog = await prisma.pointsLog.findFirst({
@@ -29,7 +53,9 @@ export async function POST(req: Request) {
     }
   }
 
-  // قاعدة القداس: الأول بـ 50، وأي قداس إضافي في نفس الأسبوع بـ 10
+  // 3. قاعدة القداس:
+  // القداس الأول في الأسبوع يأخذ الدرجة المحددة لهذا الأسبوع (المرسلة من الخادم مثلاً 100 أو 50).
+  // وأي قداس إضافي في نفس الأسبوع يحصل على 10 نقاط.
   if (reason === "القداس" && points > 0) {
     const startOfWeekDate = getStartOfWeek();
     
@@ -44,7 +70,10 @@ export async function POST(req: Request) {
       }
     });
 
-    points = liturgiesThisWeek > 0 ? 10 : 50;
+    if (liturgiesThisWeek > 0) {
+      points = 10;
+    }
+    // إذا كان أول قداس هذا الأسبوع، يُحسب بالنقاط المرسلة المحددة لهذا الأسبوع دون إجبار على 50
   }
 
   const youth = await prisma.youth.update({
@@ -103,4 +132,3 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: 'Failed to delete log' }, { status: 500 });
   }
 }
-

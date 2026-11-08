@@ -29,3 +29,9 @@ model PointsLog {
 
   youth       Youth        @relation(fields: [youthId], references: [id])
 }
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
